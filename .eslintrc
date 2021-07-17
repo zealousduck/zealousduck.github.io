@@ -1,3 +1,32 @@
 {
-  "extends": ["next", "next/core-web-vitals"]
+  "extends": [
+    "next",
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module"
+  },
+  "rules": {
+    "@typescript-eslint/no-explicit-any": 2,
+    "@typescript-eslint/no-floating-promises": 2,
+    "@typescript-eslint/no-misused-promises": 2,
+    "@typescript-eslint/no-for-in-array": 2,
+    "@typescript-eslint/no-this-alias": 2,
+    "comma-style": [
+      "warn",
+      "first"
+    ],
+    "eqeqeq": [
+      "error",
+      "smart"
+    ],
+    "no-fallthrough": 2,
+    "semi": [
+      "warn",
+      "always"
+    ]
+  }
 }

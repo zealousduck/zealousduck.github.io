@@ -14,3 +14,30 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.quest-board {
+  width: 75vw;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.quest-container {
+  width: 20em;
+  border-width: 1px;
+  background: url("../public/paper.png");
+  background-size: 100% 100%;
+  padding: 1em;
+  margin: 1em;
+  min-height: 15em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.quest-container .quest-text {
+  padding: 2em;
+  font-family: papyrus;
+  font-weight: bold;
+  font-size: 125%;
+}
