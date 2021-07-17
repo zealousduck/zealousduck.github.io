@@ -1,7 +1,7 @@
-import Head from 'next/head'
-import Image from 'next/image'
+import Head from 'next/head';
+import Image from 'next/image';
 import { getQuest } from '../app/quests';
-import styles from '../styles/Home.module.css'
+import styles from '../styles/Home.module.css';
 
 export default function Home() {
   const quests = new Array(6).fill("").map(getQuest);
@@ -19,5 +19,5 @@ export default function Home() {
           </div>))}
         </div>
     </div>
-  )
+  );
 }

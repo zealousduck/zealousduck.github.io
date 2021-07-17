@@ -10,7 +10,7 @@
 
 # next.js
 /.next/
-/out/
+# /out/ # because we commit the static resources!
 
 # production
 /build
