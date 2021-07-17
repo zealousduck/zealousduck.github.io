@@ -16,7 +16,7 @@ a {
 }
 
 .quest-board {
-  width: 75vw;
+  width: 90vw;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -30,17 +30,28 @@ a {
   background-size: 100% 100%;
   padding: 1em;
   margin: 1em;
-  min-height: 22em;
+  min-height: 24em;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
 .quest-container .quest-text {
-  padding: 1.5em;
+  padding: 1.5em 1.5em 0 1.5em;
   font-family: papyrus;
   font-weight: bold;
-  font-size: 125%;
+}
+
+@media (max-width: 600px) {
+  .quest-container .quest-text {
+    font-size: 1.1em;
+  }
+}
+
+@media (min-width: 600px) {
+  .quest-container .quest-text {
+    font-size: 1.3em;
+  }
 }
 
 .quest-container .actions {
@@ -54,4 +65,9 @@ a {
   background: transparent;
   border: none;
   cursor: pointer;
+  transition: transform 0.25s;
+}
+
+.quest-container .actions button:hover {
+  transform: scale(1.3);
 }

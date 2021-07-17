@@ -64,7 +64,7 @@ const quests: Quest[] = [
     template: `The ${Townsfolk._type} needs a prescription picked up from the herbalist for their embarrassing "condition". Discretion is appreciated.`
   })
   , buildQuest({
-    template: `A shady ${Races._type} approaches you outside of town. They want the ${Townsfolk._type} to pay up.`
+    template: `A shady ${Races._type} dealer approaches you outside of town. They want the ${Townsfolk._type} to pay up.`
   })
 ];
 
