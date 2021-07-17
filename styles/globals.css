@@ -25,7 +25,7 @@ a {
 .quest-container {
   width: 20em;
   border-width: 1px;
-  background: url("../public/paper.png");
+  background: url("/paper.png");
   background-size: 100% 100%;
   padding: 1em;
   margin: 1em;

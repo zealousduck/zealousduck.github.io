@@ -3,7 +3,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: url("../public/wood.jpg") repeat;
+  background: url("/wood.jpg") repeat;
   min-height: 100vh;
 }
 
