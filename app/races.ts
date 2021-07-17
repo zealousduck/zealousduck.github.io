@@ -1,6 +1,5 @@
 export const Races = {
-  _type: "indeednd_races"
-  , pattern: "{race}"
+  _type: "{indeednd_race}"
   , options: [
     ""
     , "human"

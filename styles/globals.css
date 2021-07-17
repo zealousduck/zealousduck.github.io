@@ -20,6 +20,7 @@ a {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  justify-content: space-around;
 }
 
 .quest-container {
@@ -29,15 +30,28 @@ a {
   background-size: 100% 100%;
   padding: 1em;
   margin: 1em;
-  min-height: 15em;
+  min-height: 22em;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .quest-container .quest-text {
-  padding: 2em;
+  padding: 1.5em;
   font-family: papyrus;
   font-weight: bold;
   font-size: 125%;
+}
+
+.quest-container .actions {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 2em;
+  opacity: 0.5;
+}
+
+.quest-container .actions button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }

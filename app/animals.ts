@@ -1,6 +1,5 @@
 export const Animals = {
-  _type: "indeednd_animal"
-  , pattern: "{animal}"
+  _type: "{indeednd_animal}"
   , options: [
     "alligator"
     , "goat"

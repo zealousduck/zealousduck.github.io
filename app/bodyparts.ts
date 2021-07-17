@@ -1,6 +1,5 @@
 export const BodyParts = {
-  _type: "indeednd_body_parts"
-  , pattern: "{body_part}"
+  _type: "{indeednd_body_parts}"
   , options: [
     "head"
     , "hand"

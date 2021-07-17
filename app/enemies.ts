@@ -1,11 +1,10 @@
 import { Races } from "./races"
 
 export const SmallEnemies = {
-  _type: "indeednd_small_enemies"
-  , pattern: "{small_enemy}"
+  _type: "{small_enemy}"
   , options: [
     "kobolds"
-    , "pack of wolves"
+    , "wolves"
     , "goblins"
     , "boars"
     , "spiders"
@@ -13,19 +12,28 @@ export const SmallEnemies = {
 }
 
 export const MediumEnemies = {
-  _type: "indeednd_medium_enemies"
-  , pattern: "{medium_enemy}"
+  _type: "{indeednd_medium_enemy}"
   , options: [
     "bandits"
-    , `${Races.pattern} bandits`
+    , `${Races._type} bandits`
+    , `dryads`
   ]
 }
 
 export const LargeEnemies = {
-  _type: "indeednd_large_enemy"
-  , pattern: "{large_enemy}"
+  _type: "{indeednd_large_enemy}"
   , options: [
     "ogre"
     , "hill giant"
+  ]
+}
+
+export const SupernaturalEnemies = {
+  _type: "{indeednd_spooky_enemy}"
+  , options: [
+    "ghost"
+    , "ghoul"
+    , "wraith"
+    , "banshee"
   ]
 }

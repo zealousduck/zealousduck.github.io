@@ -1,10 +1,27 @@
-import Head from 'next/head';
-import Image from 'next/image';
-import { getQuest } from '../app/quests';
-import styles from '../styles/Home.module.css';
+import Head from "next/head";
+import React from "react";
+import { getQuest } from "../app/quests";
+import styles from "../styles/Home.module.css";
+
+const MAX_QUESTS = 6;
 
 export default function Home() {
-  const quests = new Array(6).fill("").map(getQuest);
+  const generateUnique = (seed?: Set<string>): Set<string> => {
+    const result = seed ?? new Set<string>();
+    while (result.size < MAX_QUESTS) {
+      result.add(getQuest());
+    }
+    return result;
+  }
+
+  const [quests, setQuests] = React.useState<Set<string>>(
+    generateUnique()
+  );
+
+  React.useEffect(() => {
+    setQuests(generateUnique());
+  }, []);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -13,15 +30,32 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-        <div className="quest-board" style={{
-          // background: `url("${process.env.PUBLIC_URL}wood.jpg") repeat`
-        }}>
-          {quests.map((q) => (<div key={q} className="quest-container" style={{
-            // background: `url("${process.env.PUBLIC_URL}paper.png") no-repeat`
-          }}>
+      <div className="quest-board">
+        {Array.from(quests.entries()).map(([,q], index) => (
+          <div key={Math.random()} className="quest-container"
+          >
             <div className="quest-text">{q}</div>
-          </div>))}
-        </div>
+            <div className="actions">
+              <button className="copy"
+              onClick={() => {
+                navigator.clipboard.writeText(q).catch(console.error);
+              }}
+              >
+                <img src={"/copy.svg"} alt="copy"/>
+              </button>
+              <button className="refresh"
+                onClick={() => {
+                  const updated = Array.from(quests.entries()).map(_ => _[1]);
+                  updated[index] = getQuest();
+                  setQuests(new Set(updated));
+                }}
+              >
+                <img src={"/replay.svg"} alt="refresh"/>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

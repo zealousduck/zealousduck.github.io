@@ -11,6 +11,7 @@
     "project": "tsconfig.json"
   },
   "rules": {
+    "@next/next/no-img-element": 0,
     "@typescript-eslint/no-explicit-any": 2,
     "@typescript-eslint/no-floating-promises": 2,
     "@typescript-eslint/no-misused-promises": 2,
