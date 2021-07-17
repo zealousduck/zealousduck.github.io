@@ -55,13 +55,13 @@ const quests: Quest[] = [
     template: `The ${Townsfolk._type} needs a letter discretely delivered to their lover, the ${Townsfolk._type}.`
   })
   , buildQuest({
-    template: `The ${Townsfolk._type}'s mother-in-law was kidnapped by a ${LargeEnemies._type}. It is hiding in a nearby ${Wildlocations._type}.`
+    template: `The ${Townsfolk._type}'s mother-in-law was kidnapped by a ${LargeEnemies._type}. It is hiding in the nearby ${Wildlocations._type}.`
   })
   , buildQuest({
     template: `The farmer's fields are overrun by ${Animals._type}s. He's offering a reward to clear them out.`
   })
   , buildQuest({
-    template: `The ${Townsfolk._type} needs a prescription picked up from the herbalist for their embarrassing "condition". Discretion is appreciated.`
+    template: `The ${Townsfolk._type} needs a prescription picked up from the herbalist for their embarrassing "condition". (Discretion is appreciated.)`
   })
   , buildQuest({
     template: `A shady ${Races._type} dealer approaches you outside of town. They want the ${Townsfolk._type} to pay up.`
