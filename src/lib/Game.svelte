@@ -1,6 +1,12 @@
 <script lang="ts">
   import Guess from "./Guess.svelte";
-  import { emptyGuess, getTodaysWord, GuessCharacter, GuessResult } from "./wdlgame";
+  import {
+    emptyGuess,
+    exportGame,
+    getTodaysWord,
+    GuessCharacter,
+    GuessResult,
+  } from "./wdlgame";
 
   const word = getTodaysWord();
   let input: GuessCharacter[] = new Array(word.length).fill("");
@@ -11,6 +17,14 @@
     word.length - guesses.length - 1 // -1 to account for current input line
   );
   let success = false;
+  let gameOver = false;
+  $: {
+    gameOver = success || guesses.length >= word.length;
+    if (success && guesses.length < word.length) {
+      // push an empty guess to hide the missing input row
+      emptyGuesses.push(emptyGuess);
+    }
+  }
 
   function guess(input: string): GuessResult {
     success = input === word;
@@ -51,21 +65,43 @@
     }
   }
 
+  let copiedToClipboard = false;
   function submit(e): void {
-    const formData = new FormData(e.target);
-    const data = {};
-    const keys = [];
-    for (let field of formData) {
-      const [key, value] = field;
-      keys.push(key);
-      data[key] = value;
+    if (gameOver) {
+      navigator.clipboard.writeText(exportGame(guesses));
+      copiedToClipboard = true;
+    } else {
+      const formData = new FormData(e.target);
+      const data = {};
+      for (let field of formData) {
+        const [key, value] = field;
+        data[key] = value;
+      }
+      const formGuess = Object.keys(data)
+        .sort()
+        .map((key) => data[key])
+        .join("");
+      guess(formGuess);
+      e.target.reset(); // clear the form
+      previous = [];
+
+      if (success) {
+        const button = document.getElementById("submit-button");
+        console.log(button);
+        button.focus();
+      } else {
+        (document.forms[0][0] as HTMLElement).focus();
+      }
     }
-    keys.sort();
-    const formGuess = keys.map((key) => data[key]).join("");
-    guess(formGuess);
-    e.target.reset(); // clear the form
-    previous = [];
-    (document.forms[0][0] as HTMLElement).focus();
+  }
+
+  let buttonText = "Guess";
+  $: {
+    if (copiedToClipboard) {
+      buttonText = "Copied to clipboard!";
+    } else if (gameOver) {
+      buttonText = "Share";
+    }
   }
 </script>
 
@@ -73,41 +109,43 @@
   {#each guesses as guess}
     <Guess {guess} />
   {/each}
-  <div class="flex-row">
-    {#each input as _, i}
-      <input
-        on:input={function (e) {
-          goNext(e.target, document.forms[0][i + 1]);
-        }}
-        on:keydown={function (e) {
-          const key = e.key;
-          if (key === "Backspace") {
-            goPrev();
-          }
-        }}
-        class="character-input"
-        type="text"
-        name={`${i}`}
-        required
-        minlength={1}
-        maxlength={1}
-        autocomplete="off"
-      />
-    {/each}
-  </div>
+  {#if !gameOver}
+    <div class="flex-row">
+      {#each input as _, i}
+        <input
+          on:input={function (e) {
+            goNext(e.target, document.forms[0][i + 1]);
+          }}
+          on:keydown={function (e) {
+            const key = e.key;
+            if (key === "Backspace") {
+              goPrev();
+            }
+          }}
+          class="character-input"
+          type="text"
+          name={`${i}`}
+          required
+          minlength={1}
+          maxlength={1}
+          autocomplete="off"
+        />
+      {/each}
+    </div>
+  {/if}
   {#each emptyGuesses as guess}
     <Guess {guess} />
   {/each}
   <button
-    class={`btn`}
+    id="submit-button"
+    class={`btn ${copiedToClipboard ? "done" : "ready"}`}
     type="submit"
-    disabled={success}
     on:keydown={function (e) {
       const key = e.key;
       if (key === "Backspace") {
         goPrev();
       }
-    }}>Guess</button
+    }}>{buttonText}</button
   >
 </form>
 
@@ -144,9 +182,22 @@
     cursor: pointer;
   }
 
-  .btn:hover,
-  .btn:focus {
+  .btn.ready {
+    @apply bg-cyan-600;
+  }
+
+  .btn.ready:hover,
+  .btn.ready:focus {
     @apply bg-cyan-800;
+    outline: none;
+  }
+
+  .btn.done {
+    background-color: darkgreen;
+  }
+
+  .btn.done:hover,
+  .btn.done:focus {
     outline: none;
   }
 </style>

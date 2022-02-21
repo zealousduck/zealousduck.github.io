@@ -14,6 +14,23 @@ export function getTodaysWord(): string {
   return dictionary[index % dictionary.length];
 }
 
+export function exportGame(guesses: GuessResult[]): string {
+    let builder = `wdl: ${(new Date()).toLocaleDateString()}\r\n`;
+    for (const guess of guesses) {
+        for (const {match} of guess.characters) {
+            if (match === "EXACT") {
+                builder += "🟩 ";
+            } else if (match === "ALMOST") {
+                builder += "🟨 ";
+            } else {
+                builder += "⬛ ";
+            }
+        }
+        builder += "\r\n"
+    }
+    return builder;
+}
+
 export const emptyGuess: GuessResult = {
     characters: [
       {
