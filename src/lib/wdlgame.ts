@@ -9,7 +9,7 @@ export interface GuessResult {
 
 export function getTodaysWord(): string {
   const now = new Date().getTime() / 1000;
-  const day0 = 19044;
+  const day0 = 19043;
   const index = Math.floor(now / (60 * 60 * 24)) - day0;
   return dictionary[index % dictionary.length];
 }
