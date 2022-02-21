@@ -80,7 +80,8 @@
       const formGuess = Object.keys(data)
         .sort()
         .map((key) => data[key])
-        .join("");
+        .join("")
+        .toLowerCase();
       guess(formGuess);
       e.target.reset(); // clear the form
       previous = [];
@@ -126,6 +127,7 @@
           type="text"
           name={`${i}`}
           required
+          pattern="[A-Za-z]"
           minlength={1}
           maxlength={1}
           autocomplete="off"

@@ -15,51 +15,50 @@ export function getTodaysWord(): string {
 }
 
 export function exportGame(guesses: GuessResult[]): string {
-    let builder = `wdl: ${(new Date()).toLocaleDateString()}\r\n`;
-    for (const guess of guesses) {
-        for (const {match} of guess.characters) {
-            if (match === "EXACT") {
-                builder += "🟩 ";
-            } else if (match === "ALMOST") {
-                builder += "🟨 ";
-            } else {
-                builder += "⬛ ";
-            }
-        }
-        builder += "\r\n"
+  let builder = `wdl: ${new Date().toLocaleDateString()}\r\n`;
+  for (const guess of guesses) {
+    for (const { match } of guess.characters) {
+      if (match === "EXACT") {
+        builder += "🟩 ";
+      } else if (match === "ALMOST") {
+        builder += "🟨 ";
+      } else {
+        builder += "⬛ ";
+      }
     }
-    return builder;
+    builder += "\r\n";
+  }
+  return builder;
 }
 
 export const emptyGuess: GuessResult = {
-    characters: [
-      {
-        character: "\u200e",
-        match: "",
-      },
-      {
-        character: "\u200e",
-        match: "",
-      },
-      {
-        character: "\u200e",
-        match: "",
-      },
-      {
-        character: "\u200e",
-        match: "",
-      },
-      {
-        character: "\u200e",
-        match: "",
-      },
-      {
-        character: "\u200e",
-        match: "",
-      },
-    ],
-  };
-
+  characters: [
+    {
+      character: "\u200e",
+      match: "",
+    },
+    {
+      character: "\u200e",
+      match: "",
+    },
+    {
+      character: "\u200e",
+      match: "",
+    },
+    {
+      character: "\u200e",
+      match: "",
+    },
+    {
+      character: "\u200e",
+      match: "",
+    },
+    {
+      character: "\u200e",
+      match: "",
+    },
+  ],
+};
 
 export const dictionary = [
   "liquid",
