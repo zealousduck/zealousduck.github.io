@@ -22,19 +22,19 @@
   }
 
   .none {
-      color: white;
+    color: white;
     border-color: grey;
     background-color: grey;
   }
 
   .exact {
-      color: white;
+    color: white;
     background-color: darkgreen;
     border-color: darkgreen;
   }
 
   .almost {
-      color: white;
+    color: white;
     background-color: chocolate;
     border-color: chocolate;
   }

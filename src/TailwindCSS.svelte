@@ -20,25 +20,4 @@
     height: 100%;
     width: 100%;
   }
-
-  main {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    text-align: center;
-    margin: 0 auto;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-  }
-
-  @media (min-width: 480px) {
-    h1 {
-      max-width: none;
-    }
-
-    p {
-      max-width: none;
-    }
-  }
 </style>

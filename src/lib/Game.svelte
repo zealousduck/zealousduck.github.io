@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Character from "./Character.svelte";
+  import Guess from "./Guess.svelte";
   import { getTodaysWord, GuessCharacter, GuessResult } from "./wdlgame";
 
   const emptyGuess: GuessResult = {
@@ -33,7 +33,11 @@
 
   const word = getTodaysWord();
   let guesses: GuessResult[] = [];
-  let emptyGuesses = new Array(word.length).fill(emptyGuess,0, word.length - guesses.length);
+  let emptyGuesses: GuessResult[] = new Array(word.length).fill(
+    emptyGuess,
+    0,
+    word.length - guesses.length
+  );
   let success = false;
 
   function guess(input: string): GuessResult {
@@ -70,62 +74,45 @@
   }
 </script>
 
-<div class="wdl-game flex flex-col justify-between">
-  <div class="guesses">
-  <form on:submit|preventDefault={submit}>
-    {#each guesses as guess}
-      <div>
-        {#each guess.characters as character}
-          <Character {...character} />
-        {/each}
-      </div>
-    {/each}
-    <input
-      type="text"
-      name="guess"
-      required
-      minlength={word.length}
-      maxlength={word.length}
-      autocomplete="off"
-    />
-    {#each emptyGuesses as guess}
-      <div>
-        {#each guess.characters as character}
-          <Character {...character} />
-        {/each}
-      </div>
-    {/each}
-    <button 
-    class="btn"
-    type="submit"
-    disabled={success}
-    >Guess</button>
-  </form>
-  </div>
-</div>
+<form class="wdl-game" on:submit|preventDefault={submit}>
+  {#each guesses as guess}
+    <Guess {guess} />
+  {/each}
+  <input
+    type="text"
+    name="guess"
+    required
+    minlength={word.length}
+    maxlength={word.length}
+    autocomplete="off"
+  />
+  {#each emptyGuesses as guess}
+    <Guess {guess} />
+  {/each}
+  <button class="btn" type="submit" disabled={success}>Guess</button>
+</form>
 
 <style>
   .wdl-game {
+    @apply flex flex-col justify-between rounded bg-stone-100;
     height: 20em;
-  }
-
-  form {
-      padding: 1em;
+    padding: 1em;
   }
 
   input {
-      width: 100%;
-      border-color: light-grey;
-      border-width: 1px;
+    width: 100%;
+    border-color: light-grey;
+    border-width: 1px;
   }
 
   .btn {
-      @apply font-bold bg-cyan-600 text-white rounded;
-      padding: 0.5em 1em;
-      cursor: pointer;
+    @apply font-bold bg-cyan-600 text-white rounded;
+    margin-top: 1em;
+    padding: 0.5em 1em;
+    cursor: pointer;
   }
 
   .btn:hover {
-      @apply bg-cyan-800;
+    @apply bg-cyan-800;
   }
 </style>
