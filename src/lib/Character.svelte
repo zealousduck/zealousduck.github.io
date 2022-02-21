@@ -18,7 +18,7 @@
     height: 2em;
     border-radius: 3px;
     padding-top: 0.1em;
-    margin: 0.1em;
+    margin: 0 0.2em;
   }
 
   .none {

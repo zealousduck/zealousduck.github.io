@@ -6,7 +6,13 @@
   :root {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    font-size: 125%;
+    font-size: 150%;
+  }
+
+  @media (max-width: 410px) {
+    :root {
+      font-size: 125%;
+    }
   }
 
   body {

@@ -14,6 +14,36 @@ export function getTodaysWord(): string {
   return dictionary[index % dictionary.length];
 }
 
+export const emptyGuess: GuessResult = {
+    characters: [
+      {
+        character: "\u200e",
+        match: "",
+      },
+      {
+        character: "\u200e",
+        match: "",
+      },
+      {
+        character: "\u200e",
+        match: "",
+      },
+      {
+        character: "\u200e",
+        match: "",
+      },
+      {
+        character: "\u200e",
+        match: "",
+      },
+      {
+        character: "\u200e",
+        match: "",
+      },
+    ],
+  };
+
+
 export const dictionary = [
   "liquid",
   "asylum",

@@ -1,42 +1,14 @@
 <script lang="ts">
   import Guess from "./Guess.svelte";
-  import { getTodaysWord, GuessCharacter, GuessResult } from "./wdlgame";
-
-  const emptyGuess: GuessResult = {
-    characters: [
-      {
-        character: "\u200e",
-        match: "",
-      },
-      {
-        character: "\u200e",
-        match: "",
-      },
-      {
-        character: "\u200e",
-        match: "",
-      },
-      {
-        character: "\u200e",
-        match: "",
-      },
-      {
-        character: "\u200e",
-        match: "",
-      },
-      {
-        character: "\u200e",
-        match: "",
-      },
-    ],
-  };
+  import { emptyGuess, getTodaysWord, GuessCharacter, GuessResult } from "./wdlgame";
 
   const word = getTodaysWord();
+  let input: GuessCharacter[] = new Array(word.length).fill("");
   let guesses: GuessResult[] = [];
-  let emptyGuesses: GuessResult[] = new Array(word.length).fill(
+  let emptyGuesses: GuessResult[] = new Array(word.length - 1).fill(
     emptyGuess,
     0,
-    word.length - guesses.length
+    word.length - guesses.length - 1 // -1 to account for current input line
   );
   let success = false;
 
@@ -62,47 +34,107 @@
     return result;
   }
 
+  let previous = [];
+  function goNext(current, next): void {
+    if (
+      current.getAttribute &&
+      current.value.length === Number(current.getAttribute("maxLength"))
+    ) {
+      next.focus();
+      previous.push(current);
+    }
+  }
+
+  function goPrev(): void {
+    if (previous.length) {
+      previous.pop().focus();
+    }
+  }
+
   function submit(e): void {
     const formData = new FormData(e.target);
     const data = {};
+    const keys = [];
     for (let field of formData) {
       const [key, value] = field;
+      keys.push(key);
       data[key] = value;
     }
-    guess(data["guess"]);
-    e.target.reset();
+    keys.sort();
+    const formGuess = keys.map((key) => data[key]).join("");
+    guess(formGuess);
+    e.target.reset(); // clear the form
+    previous = [];
+    (document.forms[0][0] as HTMLElement).focus();
   }
 </script>
 
-<form class="wdl-game" on:submit|preventDefault={submit}>
+<form name="wdl" class="wdl-game" on:submit|preventDefault={submit}>
   {#each guesses as guess}
     <Guess {guess} />
   {/each}
-  <input
-    type="text"
-    name="guess"
-    required
-    minlength={word.length}
-    maxlength={word.length}
-    autocomplete="off"
-  />
+  <div class="flex-row">
+    {#each input as _, i}
+      <input
+        on:input={function (e) {
+          goNext(e.target, document.forms[0][i + 1]);
+        }}
+        on:keydown={function (e) {
+          const key = e.key;
+          if (key === "Backspace") {
+            goPrev();
+          }
+        }}
+        class="character-input"
+        type="text"
+        name={`${i}`}
+        required
+        minlength={1}
+        maxlength={1}
+        autocomplete="off"
+      />
+    {/each}
+  </div>
   {#each emptyGuesses as guess}
     <Guess {guess} />
   {/each}
-  <button class="btn" type="submit" disabled={success}>Guess</button>
+  <button
+    class={`btn`}
+    type="submit"
+    disabled={success}
+    on:keydown={function (e) {
+      const key = e.key;
+      if (key === "Backspace") {
+        goPrev();
+      }
+    }}>Guess</button
+  >
 </form>
 
 <style>
   .wdl-game {
     @apply flex flex-col justify-between rounded bg-stone-100;
     height: 20em;
-    padding: 1em;
+    padding: 1em 1em;
   }
 
   input {
-    width: 100%;
-    border-color: light-grey;
+    @apply content-center;
+    display: inline-block;
+    border-color: grey;
+    border-radius: 3px;
     border-width: 1px;
+    color: black;
+    display: inline-block;
+    height: 2em;
+    padding-top: 0.1em;
+    margin: 0 0.2em;
+    width: 2em;
+    text-align: center;
+  }
+
+  input:focus {
+    outline-color: rgb(8 145 178);
   }
 
   .btn {
@@ -112,7 +144,9 @@
     cursor: pointer;
   }
 
-  .btn:hover {
+  .btn:hover,
+  .btn:focus {
     @apply bg-cyan-800;
+    outline: none;
   }
 </style>

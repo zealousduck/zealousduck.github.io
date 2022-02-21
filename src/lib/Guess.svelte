@@ -12,7 +12,7 @@
 
 <style>
   .guess-line {
-    margin: auto;
+    margin: 0 auto;
     width: fit-content;
   }
 </style>
