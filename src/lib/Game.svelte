@@ -8,7 +8,9 @@
     GuessResult,
   } from "./wdlgame";
 
-  const word = getTodaysWord();
+  const todaysWord = getTodaysWord();
+  // const { word, date } = { word: "asylum", date: todaysWord.date }
+  const {word, date} = todaysWord;
   let input: GuessCharacter[] = new Array(word.length).fill("");
   let guesses: GuessResult[] = [];
   let emptyGuesses: GuessResult[] = new Array(word.length - 1).fill(
@@ -28,6 +30,11 @@
 
   function guess(input: string): GuessResult {
     success = input === word;
+    const characterCounts = new Map<string, number>();
+    for (let i = 0; i < word.length; i += 1) {
+      const count = characterCounts.get(word.charAt(i)) ?? 0;
+      characterCounts.set(word.charAt(i), count + 1);
+    }
     const result: GuessResult = {
       characters: [],
     };
@@ -35,9 +42,14 @@
       let match: GuessCharacter["match"] = "NONE";
       if (word.charAt(i) === input.charAt(i)) {
         match = "EXACT";
-      } else if (word.includes(input.charAt(i))) {
+      } else if (
+        word.includes(input.charAt(i)) &&
+        characterCounts.get(input.charAt(i)) > 0
+      ) {
         match = "ALMOST";
       }
+      const count = characterCounts.get(input.charAt(i)) ?? 0;
+      characterCounts.set(input.charAt(i), count - 1);
       result.characters[i] = {
         character: input.charAt(i),
         match,
@@ -68,7 +80,7 @@
   let copiedToClipboard = false;
   function submit(e): void {
     if (gameOver) {
-      navigator.clipboard.writeText(exportGame(guesses));
+      navigator.clipboard.writeText(exportGame(todaysWord, guesses));
       copiedToClipboard = true;
     } else {
       const formData = new FormData(e.target);
@@ -107,6 +119,9 @@
 </script>
 
 <form name="wdl" class="wdl-game" on:submit|preventDefault={submit}>
+  <div>
+    <h2>{todaysWord.date.toLocaleString()}</h2>
+  </div>
   {#each guesses as guess}
     <Guess {guess} />
   {/each}
@@ -155,7 +170,12 @@
   .wdl-game {
     @apply flex flex-col justify-between rounded bg-stone-100;
     height: 20em;
-    padding: 1em 1em;
+    padding: 0.25em 1em 1em 1em;
+  }
+
+  h2 {
+    font-weight: lighter;
+    padding-bottom: 0.2em;
   }
 
   input {
@@ -168,7 +188,7 @@
     display: inline-block;
     height: 2em;
     padding-top: 0.1em;
-    margin: 0 0.2em;
+    margin: 0.2em 0.2em;
     width: 2em;
     text-align: center;
   }
@@ -179,7 +199,7 @@
 
   .btn {
     @apply font-bold bg-cyan-600 text-white rounded;
-    margin-top: 1em;
+    margin-top: 0.5em;
     padding: 0.5em 1em;
     cursor: pointer;
   }

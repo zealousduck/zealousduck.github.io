@@ -1,6 +1,6 @@
 <script lang="ts">
   import Character from "./Character.svelte";
-  import type { GuessResult } from "./wdlgame";
+  import { getYesterdaysWord, GuessResult } from "./wdlgame";
 
   const today = new Date().toLocaleDateString();
 
@@ -32,13 +32,15 @@
       },
     ],
   };
+
+  const yesterdaysWord = getYesterdaysWord();
 </script>
 
 <div class="logo">
   {#each logo.characters as character}
     <Character {...character} />
   {/each}
-  <h2>{today}</h2>
+  <h2>{`Yesterday's answer: ${yesterdaysWord.word}`}</h2>
 </div>
 
 <style>

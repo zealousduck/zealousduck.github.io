@@ -12,6 +12,7 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.30",
     "@tsconfig/svelte": "^2.0.1",
+    "@types/luxon": "^2.0.9",
     "autoprefixer": "^10.4.2",
     "postcss": "^8.4.6",
     "svelte": "^3.44.0",
@@ -23,6 +24,7 @@
     "vite": "^2.8.0"
   },
   "dependencies": {
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "luxon": "^2.3.0"
   }
 }

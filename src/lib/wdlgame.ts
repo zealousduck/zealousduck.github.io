@@ -1,3 +1,5 @@
+import {DateTime} from "luxon";
+
 export interface GuessCharacter {
   match: "" | "NONE" | "ALMOST" | "EXACT";
   character: string;
@@ -7,16 +9,39 @@ export interface GuessResult {
   characters: GuessCharacter[];
 }
 
-export function getTodaysWord(): string {
-  const now = new Date().getTime() / 1000;
-  const day0 = 19043;
-  const index = Math.floor(now / (60 * 60 * 24)) - day0;
-  const dict = JSON.parse(atob(dictionary))
-  return dict[index % dictionary.length];
+export interface TodaysWord {
+  word: string;
+  date: DateTime;
 }
 
-export function exportGame(guesses: GuessResult[]): string {
-  let builder = `wdl: ${new Date().toLocaleDateString()}\r\n`;
+export function getYesterdaysWord(): TodaysWord {
+  const epoch = DateTime.fromObject({ year: 2022, month: 2, day: 20 });
+  const index = -Math.floor(epoch.diffNow("days").days) - 1;
+  const dict = JSON.parse(atob(dictionary))
+  const result ={
+    word: dict[index % dictionary.length]
+    , date: epoch.plus({ days: index })
+  };
+  return result;
+}
+
+
+export function getTodaysWord(): TodaysWord {
+  const epoch = DateTime.fromObject({ year: 2022, month: 2, day: 20, minute: 0, hour: 0, second: 0 });
+  const today = DateTime.fromJSDate(new Date());
+  console.log(today.toString())
+  const index = -Math.floor(epoch.diff(today, "days").days);
+  console.log(index)
+  const dict = JSON.parse(atob(dictionary))
+  const result ={
+    word: dict[index % dictionary.length]
+    , date: today
+  };
+  return result;
+}
+
+export function exportGame(todaysWord: TodaysWord, guesses: GuessResult[]): string {
+  let builder = `wdl: ${todaysWord.date.toJSDate().toLocaleDateString()}\r\n`;
   for (const guess of guesses) {
     for (const { match } of guess.characters) {
       if (match === "EXACT") {
