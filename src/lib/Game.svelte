@@ -6,12 +6,12 @@
     getTodaysWord,
     GuessCharacter,
     GuessResult,
-    validWords
+    validWords,
   } from "./wdlgame";
 
   const todaysWord = getTodaysWord();
   // const { word, date } = { word: "asylum", date: todaysWord.date }
-  const {word, date} = todaysWord;
+  const { word, date } = todaysWord;
   let tentative;
   let input: GuessCharacter[] = new Array(word.length).fill("");
   let guesses: GuessResult[] = [];
@@ -20,15 +20,6 @@
     0,
     word.length - guesses.length - 1 // -1 to account for current input line
   );
-  let success = false;
-  let gameOver = false;
-  $: {
-    gameOver = success || guesses.length >= word.length;
-    if (success && guesses.length < word.length) {
-      // push an empty guess to hide the missing input row
-      emptyGuesses.push(emptyGuess);
-    }
-  }
 
   function guess(input: string): GuessResult {
     success = input === word;
@@ -68,32 +59,34 @@
       current.getAttribute &&
       current.value.length === Number(current.getAttribute("maxLength"))
     ) {
-      getCurrentFormWord();
+      readFormState();
       next.focus();
       previous.push(current);
     }
   }
 
   function goPrev(): void {
-    getCurrentFormWord();
     if (previous.length) {
-      previous.pop().focus();
+      const prev = previous.pop();
+      prev.value = "";
+      prev.focus();
     }
+    readFormState();
   }
 
-  function getCurrentFormWord(): void {
-      const formData = new FormData(document.forms["wdl"]);
-      const data = {};
-      for (let field of formData) {
-        const [key, value] = field;
-        data[key] = value;
-      }
-      const formWord = Object.keys(data)
-        .sort()
-        .map((key) => data[key])
-        .join("")
-        .toLowerCase();
-      tentative = formWord;
+  function readFormState(): void {
+    const formData = new FormData(document.forms["wdl"]);
+    const data = {};
+    for (let field of formData) {
+      const [key, value] = field;
+      data[key] = value;
+    }
+    const formWord = Object.keys(data)
+      .sort()
+      .map((key) => data[key])
+      .join("")
+      .toLowerCase();
+    tentative = formWord;
   }
 
   let copiedToClipboard = false;
@@ -101,17 +94,16 @@
     if (gameOver) {
       navigator.clipboard.writeText(exportGame(todaysWord, guesses));
       copiedToClipboard = true;
-    } else if (disabled) {
+    } else if (badWord) {
       alert("Please use a real word.");
     } else {
-      console.log(tentative)
       guess(tentative);
       e.target.reset(); // clear the form
+      tentative = "";
       previous = [];
 
       if (success) {
         const button = document.getElementById("submit-button");
-        console.log(button);
         button.focus();
       } else {
         (document.forms[0][0] as HTMLElement).focus();
@@ -119,18 +111,26 @@
     }
   }
 
-  let disabled = false;
+  let badWord = false;
+  let success = false;
+  let gameOver = false;
   let buttonText = "That's not a word!";
   $: {
-    disabled=false;
+    gameOver = success || guesses.length >= word.length;
+    if (success && guesses.length < word.length) {
+      // push an empty guess to hide the missing input row
+      emptyGuesses.push(emptyGuess);
+    }
+
+    badWord = !gameOver && !validWords.has(tentative);
+
     if (copiedToClipboard) {
       buttonText = "Copied to clipboard!";
     } else if (gameOver) {
       buttonText = "Share";
-    } else if (validWords.has(tentative)) {
+    } else if (!badWord) {
       buttonText = "Guess";
     } else {
-      disabled=true;
       buttonText = "That's not a word!";
     }
   }
@@ -173,7 +173,9 @@
   {/each}
   <button
     id="submit-button"
-    class={`btn ${copiedToClipboard ? "done" : "ready"} ${disabled ? "disabled" : ""}`}
+    class={`btn ${copiedToClipboard && "done"} ${
+      badWord ? "disabled" : "ready"
+    }`}
     type="submit"
     on:keydown={function (e) {
       const key = e.key;
@@ -209,6 +211,7 @@
     margin: 0.2em 0.2em;
     width: 2em;
     text-align: center;
+    text-transform: lowercase;
   }
 
   input:focus {
@@ -220,9 +223,15 @@
     margin-top: 0.5em;
     padding: 0.5em 1em;
     cursor: pointer;
+    outline: none;
   }
 
   .btn.disabled {
+    @apply bg-stone-600;
+  }
+
+  .btn.disabled:hover,
+  .btn.disabled:focus {
     @apply bg-orange-900;
   }
 
@@ -233,7 +242,6 @@
   .btn.ready:hover,
   .btn.ready:focus {
     @apply bg-cyan-800;
-    outline: none;
   }
 
   .btn.done {
@@ -242,6 +250,7 @@
 
   .btn.done:hover,
   .btn.done:focus {
+    background-color: darkgreen;
     outline: none;
   }
 </style>
