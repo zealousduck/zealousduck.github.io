@@ -6,11 +6,13 @@
     getTodaysWord,
     GuessCharacter,
     GuessResult,
+    validWords
   } from "./wdlgame";
 
   const todaysWord = getTodaysWord();
-  // const { word, date } = { word: "asylum", date: todaysWord.date }
-  const {word, date} = todaysWord;
+  const { word, date } = { word: "asylum", date: todaysWord.date }
+  // const {word, date} = todaysWord;
+  let tentative;
   let input: GuessCharacter[] = new Array(word.length).fill("");
   let guesses: GuessResult[] = [];
   let emptyGuesses: GuessResult[] = new Array(word.length - 1).fill(
@@ -66,15 +68,32 @@
       current.getAttribute &&
       current.value.length === Number(current.getAttribute("maxLength"))
     ) {
+      getCurrentFormWord();
       next.focus();
       previous.push(current);
     }
   }
 
   function goPrev(): void {
+    getCurrentFormWord();
     if (previous.length) {
       previous.pop().focus();
     }
+  }
+
+  function getCurrentFormWord(): void {
+      const formData = new FormData(document.forms["wdl"]);
+      const data = {};
+      for (let field of formData) {
+        const [key, value] = field;
+        data[key] = value;
+      }
+      const formWord = Object.keys(data)
+        .sort()
+        .map((key) => data[key])
+        .join("")
+        .toLowerCase();
+      tentative = formWord;
   }
 
   let copiedToClipboard = false;
@@ -82,19 +101,11 @@
     if (gameOver) {
       navigator.clipboard.writeText(exportGame(todaysWord, guesses));
       copiedToClipboard = true;
+    } else if (disabled) {
+      alert("Please use a real word.");
     } else {
-      const formData = new FormData(e.target);
-      const data = {};
-      for (let field of formData) {
-        const [key, value] = field;
-        data[key] = value;
-      }
-      const formGuess = Object.keys(data)
-        .sort()
-        .map((key) => data[key])
-        .join("")
-        .toLowerCase();
-      guess(formGuess);
+      console.log(tentative)
+      guess(tentative);
       e.target.reset(); // clear the form
       previous = [];
 
@@ -108,12 +119,19 @@
     }
   }
 
-  let buttonText = "Guess";
+  let disabled = false;
+  let buttonText = "That's not a word!";
   $: {
+    disabled=false;
     if (copiedToClipboard) {
       buttonText = "Copied to clipboard!";
     } else if (gameOver) {
       buttonText = "Share";
+    } else if (validWords.has(tentative)) {
+      buttonText = "Guess";
+    } else {
+      disabled=true;
+      buttonText = "That's not a word!";
     }
   }
 </script>
@@ -155,7 +173,7 @@
   {/each}
   <button
     id="submit-button"
-    class={`btn ${copiedToClipboard ? "done" : "ready"}`}
+    class={`btn ${copiedToClipboard ? "done" : "ready"} ${disabled ? "disabled" : ""}`}
     type="submit"
     on:keydown={function (e) {
       const key = e.key;
@@ -202,6 +220,10 @@
     margin-top: 0.5em;
     padding: 0.5em 1em;
     cursor: pointer;
+  }
+
+  .btn.disabled {
+    @apply bg-orange-900;
   }
 
   .btn.ready {

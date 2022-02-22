@@ -1,4 +1,7 @@
 import {DateTime} from "luxon";
+import valid_words from "./words_pruned.json"
+
+export const validWords = new Set<string>(valid_words);
 
 export interface GuessCharacter {
   match: "" | "NONE" | "ALMOST" | "EXACT";
