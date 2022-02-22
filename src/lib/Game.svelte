@@ -10,8 +10,8 @@
   } from "./wdlgame";
 
   const todaysWord = getTodaysWord();
-  const { word, date } = { word: "asylum", date: todaysWord.date }
-  // const {word, date} = todaysWord;
+  // const { word, date } = { word: "asylum", date: todaysWord.date }
+  const {word, date} = todaysWord;
   let tentative;
   let input: GuessCharacter[] = new Array(word.length).fill("");
   let guesses: GuessResult[] = [];
