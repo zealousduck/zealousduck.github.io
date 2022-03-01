@@ -12,7 +12,6 @@
 
   const todaysWord = getTodaysWord();
   // const { word, date } = { word: "waffle", date: DateTime.fromObject({ year : 2020 })}
-  // const { word, date } = { word: "waffle", date: todaysWord.date };
   const { word, date } = todaysWord;
   let tentative;
   let input: GuessCharacter[] = new Array(word.length).fill("");
