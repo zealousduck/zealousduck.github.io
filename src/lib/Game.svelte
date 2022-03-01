@@ -1,5 +1,6 @@
 <script lang="ts">
   import Guess from "./Guess.svelte";
+  import { store } from "./store";
   import {
     emptyGuess,
     exportGame,
@@ -10,16 +11,12 @@
   } from "./wdlgame";
 
   const todaysWord = getTodaysWord();
-  // const { word, date } = { word: "asylum", date: todaysWord.date }
+  // const { word, date } = { word: "waffle", date: DateTime.fromObject({ year : 2020 })}
+  // const { word, date } = { word: "waffle", date: todaysWord.date };
   const { word, date } = todaysWord;
   let tentative;
   let input: GuessCharacter[] = new Array(word.length).fill("");
-  let guesses: GuessResult[] = [];
-  let emptyGuesses: GuessResult[] = new Array(word.length - 1).fill(
-    emptyGuess,
-    0,
-    word.length - guesses.length - 1 // -1 to account for current input line
-  );
+  let emptyGuesses: GuessResult[];
 
   function guess(input: string): GuessResult {
     success = input === word;
@@ -35,20 +32,34 @@
       let match: GuessCharacter["match"] = "NONE";
       if (word.charAt(i) === input.charAt(i)) {
         match = "EXACT";
-      } else if (
-        word.includes(input.charAt(i)) &&
-        characterCounts.get(input.charAt(i)) > 0
-      ) {
-        match = "ALMOST";
+        const count = characterCounts.get(input.charAt(i)) ?? 0;
+        characterCounts.set(input.charAt(i), count - 1);
       }
-      const count = characterCounts.get(input.charAt(i)) ?? 0;
-      characterCounts.set(input.charAt(i), count - 1);
       result.characters[i] = {
         character: input.charAt(i),
         match,
       };
     }
-    guesses = [...guesses, result];
+    for (let i = 0; i < input.length; i += 1) {
+      let match: GuessCharacter["match"] = result.characters[i].match;
+      if (
+        word.charAt(i) !== input.charAt(i) &&
+        word.includes(input.charAt(i)) &&
+        characterCounts.get(input.charAt(i)) > 0
+      ) {
+        match = "ALMOST";
+        const count = characterCounts.get(input.charAt(i)) ?? 0;
+        characterCounts.set(input.charAt(i), count - 1);
+      }
+      result.characters[i] = {
+        character: input.charAt(i),
+        match,
+      };
+    }
+    store.set({
+      date,
+      guesses: [...$store.guesses, result],
+    });
     emptyGuesses = emptyGuesses.slice(1);
     return result;
   }
@@ -92,7 +103,7 @@
   let copiedToClipboard = false;
   function submit(e): void {
     if (gameOver) {
-      navigator.clipboard.writeText(exportGame(todaysWord, guesses));
+      navigator.clipboard.writeText(exportGame(todaysWord, $store.guesses));
       copiedToClipboard = true;
     } else if (badWord) {
       alert("Please use a real word.");
@@ -116,8 +127,17 @@
   let gameOver = false;
   let buttonText = "That's not a word!";
   $: {
-    gameOver = success || guesses.length >= word.length;
-    if (success && guesses.length < word.length) {
+    if ($store.date && $store.date.toISODate() !== date.toISODate()) {
+      store.set({ date, guesses: [] });
+    }
+    emptyGuesses = new Array(word.length - $store.guesses.length - 1).fill(
+      emptyGuess,
+      0,
+      word.length - $store.guesses.length - 1 // -1 to account for current input line
+    );
+
+    gameOver = success || $store.guesses.length >= word.length;
+    if (success && $store.guesses.length < word.length) {
       // push an empty guess to hide the missing input row
       emptyGuesses.push(emptyGuess);
     }
@@ -140,7 +160,7 @@
   <div>
     <h2>{todaysWord.date.toLocaleString()}</h2>
   </div>
-  {#each guesses as guess}
+  {#each $store.guesses as guess}
     <Guess {guess} />
   {/each}
   {#if !gameOver}

@@ -45,6 +45,11 @@ export function exportGame(
   todaysWord: TodaysWord,
   guesses: GuessResult[]
 ): string {
+  // TODO include number of attempts!
+  // TODO linear backspace behavior
+  // TODO cookie?
+  // TODO infinite?
+  // TODO scrabble letters w/ randomizer?
   let builder = `wdl: ${todaysWord.date.toJSDate().toLocaleDateString()}\r\n`;
   for (const guess of guesses) {
     for (const { match } of guess.characters) {

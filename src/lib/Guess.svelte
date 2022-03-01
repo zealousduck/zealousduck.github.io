@@ -2,6 +2,7 @@
   import type { GuessResult } from "./wdlgame";
   import Character from "./Character.svelte";
   export let guess: GuessResult;
+  console.log(guess);
 </script>
 
 <div class="guess-line">
