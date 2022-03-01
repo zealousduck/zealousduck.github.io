@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { writable } from "svelte/store";
-import type { GuessResult } from "./wdlgame";
+import type { GuessResult, TodaysWord } from "./wdlgame";
 
 export interface WdlStore {
   date: DateTime;

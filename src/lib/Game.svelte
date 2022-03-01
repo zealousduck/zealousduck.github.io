@@ -130,6 +130,13 @@
     if ($store.date && $store.date.toISODate() !== date.toISODate()) {
       store.set({ date, guesses: [] });
     }
+    if ($store.guesses.length) {
+      // wow this sure is unreadable, huh?
+      success =
+        $store.guesses[$store.guesses.length - 1].characters
+          .map((_) => _.character)
+          .join("") === word;
+    }
     emptyGuesses = new Array(word.length - $store.guesses.length - 1).fill(
       emptyGuess,
       0,
