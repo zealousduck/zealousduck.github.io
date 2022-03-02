@@ -1,4 +1,6 @@
 <script lang="ts">
+import { DateTime } from "luxon";
+
   import Guess from "./Guess.svelte";
   import { store } from "./store";
   import {
@@ -136,10 +138,13 @@
           .map((_) => _.character)
           .join("") === word;
     }
-    emptyGuesses = new Array(word.length - $store.guesses.length - 1).fill(
+
+    // -1 to account for current input line
+    const emptyLength = Math.max(word.length - $store.guesses.length - 1, 0);
+    emptyGuesses = new Array(emptyLength).fill(
       emptyGuess,
       0,
-      word.length - $store.guesses.length - 1 // -1 to account for current input line
+      emptyLength
     );
 
     gameOver = success || $store.guesses.length >= word.length;
