@@ -15,8 +15,11 @@
     }
   }
 
+  html {
+    @apply bg-stone-200;
+  }
+
   body {
-    height: 100vh;
     width: 100vw;
     padding: 0;
     margin: 0;

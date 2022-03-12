@@ -23,14 +23,13 @@
     padding: 0;
     height: 100%;
     width: 100%;
-    @apply bg-stone-200;
   }
 
   .wrapper {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 700px;
+    max-width: 600px;
   }
 
   @media (max-width: 500px) {
