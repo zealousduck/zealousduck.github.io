@@ -1,10 +1,12 @@
 <script lang="ts">
-import { DateTime } from "luxon";
+  import { DateTime } from "luxon";
 
   import Guess from "./Guess.svelte";
+  import Keyboard from "./Keyboard.svelte";
   import { store } from "./store";
   import {
     emptyGuess,
+    EMPTY_CHARACTER,
     exportGame,
     getTodaysWord,
     GuessCharacter,
@@ -15,11 +17,23 @@ import { DateTime } from "luxon";
   const todaysWord = getTodaysWord();
   // const { word, date } = { word: "waffle", date: DateTime.fromObject({ year : 2020 })}
   const { word, date } = todaysWord;
-  let tentative;
-  let input: GuessCharacter[] = new Array(word.length).fill("");
-  let emptyGuesses: GuessResult[];
 
-  function guess(input: string): GuessResult {
+  let emptyGuesses: GuessResult[];
+  let position: number = 0;
+  let characters: GuessCharacter[] = new Array(word.length).fill({
+    character: EMPTY_CHARACTER,
+    match: "",
+  });
+
+  function resetGuess(): void {
+    characters = new Array(word.length).fill({
+      character: EMPTY_CHARACTER,
+      match: "",
+    });
+    position = 0;
+  }
+
+  function doGuess(input: string): GuessResult {
     success = input === word;
     const characterCounts = new Map<string, number>();
     for (let i = 0; i < word.length; i += 1) {
@@ -62,71 +76,14 @@ import { DateTime } from "luxon";
       guesses: [...$store.guesses, result],
     });
     emptyGuesses = emptyGuesses.slice(1);
+    resetGuess();
     return result;
   }
 
-  let previous = [];
-  function goNext(current, next): void {
-    if (
-      current.getAttribute &&
-      current.value.length === Number(current.getAttribute("maxLength"))
-    ) {
-      readFormState();
-      next.focus();
-      previous.push(current);
-    }
-  }
-
-  function goPrev(): void {
-    if (previous.length) {
-      const prev = previous.pop();
-      prev.value = "";
-      prev.focus();
-    }
-    readFormState();
-  }
-
-  function readFormState(): void {
-    const formData = new FormData(document.forms["wdl"]);
-    const data = {};
-    for (let field of formData) {
-      const [key, value] = field;
-      data[key] = value;
-    }
-    const formWord = Object.keys(data)
-      .sort()
-      .map((key) => data[key])
-      .join("")
-      .toLowerCase();
-    tentative = formWord;
-  }
-
-  let copiedToClipboard = false;
-  function submit(e): void {
-    if (gameOver) {
-      navigator.clipboard.writeText(exportGame(todaysWord, $store.guesses));
-      copiedToClipboard = true;
-    } else if (badWord) {
-      alert("Please use a real word.");
-    } else {
-      guess(tentative);
-      e.target.reset(); // clear the form
-      tentative = "";
-      previous = [];
-
-      if (success) {
-        const button = document.getElementById("submit-button");
-        button.focus();
-      } else {
-        (document.forms[0][0] as HTMLElement).focus();
-      }
-    }
-  }
-
+  let gameCopiedToClipboard = false;
   let badWord = false;
   let success = false;
   let gameOver = false;
-  let buttonText = "That's not a word!";
   $: {
     if ($store.date && $store.date.toISODate() !== date.toISODate()) {
       store.set({ date, guesses: [] });
@@ -141,11 +98,7 @@ import { DateTime } from "luxon";
 
     // -1 to account for current input line
     const emptyLength = Math.max(word.length - $store.guesses.length - 1, 0);
-    emptyGuesses = new Array(emptyLength).fill(
-      emptyGuess,
-      0,
-      emptyLength
-    );
+    emptyGuesses = new Array(emptyLength).fill(emptyGuess, 0, emptyLength);
 
     gameOver = success || $store.guesses.length >= word.length;
     if (success && $store.guesses.length < word.length) {
@@ -153,75 +106,89 @@ import { DateTime } from "luxon";
       emptyGuesses.push(emptyGuess);
     }
 
-    badWord = !gameOver && !validWords.has(tentative);
-
-    if (copiedToClipboard) {
-      buttonText = "Copied to clipboard!";
-    } else if (gameOver) {
-      buttonText = "Share";
-    } else if (!badWord) {
-      buttonText = "Guess";
-    } else {
-      buttonText = "That's not a word!";
-    }
+    const tentative = characters.map(_ => _.character).filter(_ => _ !== EMPTY_CHARACTER).join("");
+    badWord = tentative.length === word.length && !validWords.has(tentative);
   }
 </script>
 
-<form name="wdl" class="wdl-game" on:submit|preventDefault={submit}>
-  <div>
-    <h2>{todaysWord.date.toLocaleString()}</h2>
-  </div>
-  {#each $store.guesses as guess}
-    <Guess {guess} />
-  {/each}
-  {#if !gameOver}
-    <div class="flex-row">
-      {#each input as _, i}
-        <input
-          on:input={function (e) {
-            goNext(e.target, document.forms[0][i + 1]);
-          }}
-          on:keydown={function (e) {
-            const key = e.key;
-            if (key === "Backspace") {
-              goPrev();
-            }
-          }}
-          class="character-input"
-          type="text"
-          name={`${i}`}
-          required
-          pattern="[A-Za-z]"
-          minlength={1}
-          maxlength={1}
-          autocomplete="off"
-        />
-      {/each}
+<div name="wdl" class="wdl-game">
+  <div class="rows">
+    <div>
+      <h2>{todaysWord.date.toLocaleString()}</h2>
     </div>
-  {/if}
-  {#each emptyGuesses as guess}
-    <Guess {guess} />
-  {/each}
-  <button
-    id="submit-button"
-    class={`btn ${copiedToClipboard && "done"} ${
-      badWord ? "disabled" : "ready"
-    }`}
-    type="submit"
-    on:keydown={function (e) {
-      const key = e.key;
-      if (key === "Backspace") {
-        goPrev();
+    {#each $store.guesses as guess}
+      <Guess {guess} />
+    {/each}
+    {#if !gameOver}
+      <Guess guess={{ characters }} focus={position} classes={badWord ? "invalid": ""}/>
+    {/if}
+    {#each emptyGuesses as guess}
+      <Guess {guess} />
+    {/each}
+    {#if gameOver}
+      <div class="actions">
+        <button
+        class={gameCopiedToClipboard ? "done" : "ready"}
+          on:click={() => {
+            navigator.clipboard.writeText(
+              exportGame(todaysWord, $store.guesses)
+            );
+            gameCopiedToClipboard = true;
+            // scoreCopiedToClipboard = false;
+          }}
+        >
+          <span>{gameCopiedToClipboard ? "Copied" : "Share"}</span>
+          <!-- heroicons copy-to-clipboard -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="share"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="1"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+            />
+          </svg>
+        </button>
+      </div>
+    {/if}
+  </div>
+  <Keyboard
+    onInput={(character) => {
+      if (position < word.length) {
+        characters[position] = { character, match: "" };
+        position += 1;
       }
-    }}>{buttonText}</button
-  >
-</form>
+    }}
+    onBackspace={() => {
+      if (position > 0) {
+        position -= 1;
+        characters[position] = { character: EMPTY_CHARACTER, match: "" };
+      }
+    }}
+    onSubmit={() => {
+      const guess = characters.map((_) => _.character).join("");
+      const isValid = validWords.has(guess);
+      if (isValid) {
+        doGuess(guess);
+      } else {
+        alert("Please use a real word.");
+        resetGuess();
+      }
+    }}
+  />
+</div>
 
 <style>
   .wdl-game {
     @apply flex flex-col justify-between rounded bg-stone-100;
-    height: 20em;
-    padding: 0.25em 1em 1em 1em;
+    flex: 1 0 auto;
+    padding-bottom: 0.15em;
+    margin-bottom: 0.1em;
   }
 
   h2 {
@@ -229,59 +196,38 @@ import { DateTime } from "luxon";
     padding-bottom: 0.2em;
   }
 
-  input {
-    @apply content-center;
-    display: inline-block;
-    border-color: grey;
-    border-radius: 3px;
-    border-width: 1px;
-    color: black;
-    display: inline-block;
-    height: 2em;
-    padding-top: 0.1em;
-    margin: 0.2em 0.2em;
-    width: 2em;
-    text-align: center;
-    text-transform: lowercase;
+  .actions {
+    @apply text-white;
+    display: flex;
+    padding: 1em 3em;
+    justify-content: space-evenly;
+    width: 100%;
   }
 
-  input:focus {
-    outline-color: rgb(8 145 178);
-  }
-
-  .btn {
-    @apply font-bold bg-cyan-600 text-white rounded;
-    margin-top: 0.5em;
-    padding: 0.5em 1em;
-    cursor: pointer;
-    outline: none;
-  }
-
-  .btn.disabled {
-    @apply bg-stone-600;
-  }
-
-  .btn.disabled:hover,
-  .btn.disabled:focus {
-    @apply bg-orange-900;
-  }
-
-  .btn.ready {
+  .actions button.ready {
     @apply bg-cyan-600;
   }
-
-  .btn.ready:hover,
-  .btn.ready:focus {
+  .actions button.ready:hover {
     @apply bg-cyan-800;
   }
-
-  .btn.done {
+  .actions button.done {
     background-color: darkgreen;
   }
 
-  .btn.done:hover,
-  .btn.done:focus {
-    background-color: darkgreen;
-    outline: none;
+  .actions button {
+    border-radius: 999em;
+    height: fit-content;
+    width: fit-content;
+    padding: 0.3em 0.6em;
+    position: relative;
+  }
+
+  .actions button svg {
+    display: inline;
+    height: 1.5em;
+    width: 1.5em;
+    position: relative;
+    top: -1px;
+    left: 1px;
   }
 </style>

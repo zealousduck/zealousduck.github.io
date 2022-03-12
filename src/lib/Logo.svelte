@@ -1,6 +1,6 @@
 <script lang="ts">
   import Character from "./Character.svelte";
-  import { getYesterdaysWord, GuessResult } from "./wdlgame";
+  import { EMPTY_CHARACTER, getYesterdaysWord, GuessResult } from "./wdlgame";
 
   const today = new Date().toLocaleDateString();
 
@@ -11,11 +11,11 @@
         match: "EXACT",
       },
       {
-        character: "\u200e",
+        character: EMPTY_CHARACTER,
         match: "NONE",
       },
       {
-        character: "\u200e",
+        character: EMPTY_CHARACTER,
         match: "NONE",
       },
       {
@@ -27,7 +27,7 @@
         match: "EXACT",
       },
       {
-        character: "\u200e",
+        character: EMPTY_CHARACTER,
         match: "NONE",
       },
     ],

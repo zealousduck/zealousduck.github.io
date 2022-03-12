@@ -7,7 +7,7 @@
 <TailwindCss />
 
 <main class="flex centered">
-  <div class="flex-col justify-center">
+  <div class="wrapper justify-center">
     <Logo />
     <Game />
   </div>
@@ -24,5 +24,18 @@
     height: 100%;
     width: 100%;
     @apply bg-stone-200;
+  }
+
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  @media (max-width: 500px) {
+    .wrapper {
+      width: 98%;
+    }
   }
 </style>

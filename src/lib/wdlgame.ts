@@ -3,6 +3,8 @@ import valid_words from "./words_pruned.json";
 
 export const validWords = new Set<string>(valid_words);
 
+export const EMPTY_CHARACTER = "\u200e";
+
 export interface GuessCharacter {
   match: "" | "NONE" | "ALMOST" | "EXACT";
   character: string;
@@ -46,8 +48,6 @@ export function exportGame(
   guesses: GuessResult[]
 ): string {
   // TODO include number of attempts!
-  // TODO linear backspace behavior
-  // TODO scrabble letters w/ randomizer?
   let builder = `wdl: ${todaysWord.date.toJSDate().toLocaleDateString()}\r\n`;
   for (const guess of guesses) {
     for (const { match } of guess.characters) {

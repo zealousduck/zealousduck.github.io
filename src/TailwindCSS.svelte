@@ -20,6 +20,9 @@
     width: 100vw;
     padding: 0;
     margin: 0;
+    /* prevent scrolling */
+    overflow: hidden;
+    position: fixed;
   }
 
   #app {
