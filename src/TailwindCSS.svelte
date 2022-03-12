@@ -21,8 +21,8 @@
     padding: 0;
     margin: 0;
     /* prevent scrolling */
-    overflow: hidden;
-    position: fixed;
+    /* overflow: hidden;
+    position: fixed; */
   }
 
   #app {

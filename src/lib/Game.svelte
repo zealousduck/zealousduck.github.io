@@ -125,6 +125,7 @@
     {#each emptyGuesses as guess}
       <Guess {guess} />
     {/each}
+  </div>
     {#if gameOver}
       <div class="actions">
         <button
@@ -155,8 +156,7 @@
           </svg>
         </button>
       </div>
-    {/if}
-  </div>
+      {:else}
   <Keyboard
     onInput={(character) => {
       if (position < word.length) {
@@ -181,19 +181,24 @@
       }
     }}
   />
+    {/if}
 </div>
 
 <style>
   .wdl-game {
-    @apply flex flex-col justify-between rounded bg-stone-100;
-    flex: 1 0 auto;
+    @apply flex flex-col justify-start rounded bg-stone-100;
     padding-bottom: 0.15em;
     margin-bottom: 0.1em;
+    height: fit-content;
   }
 
   h2 {
     font-weight: lighter;
     padding-bottom: 0.2em;
+  }
+
+  .rows {
+    padding-bottom: 1em;
   }
 
   .actions {

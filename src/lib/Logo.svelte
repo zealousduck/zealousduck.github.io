@@ -45,7 +45,7 @@
 
 <style>
   .logo {
-    padding: 1.5em 1em;
+    padding: 1em 1em 0.5em 1em;
   }
 
   h2 {
