@@ -21,9 +21,11 @@
       for (const { character, match } of $store.guesses
         .map((_) => _.characters)
         .flat()) {
-        if (match === "EXACT") {
-          guessed.set(character, match);
-        } else if (guessed.get(character) !== "EXACT") {
+            const known = guessed.get(character);
+            const isExact = match === "EXACT";
+            const isAlmost = match === "ALMOST" && known !== "EXACT";
+            const isNone = match === "NONE" && (known !== "EXACT" && known !== "ALMOST");
+            if (isExact || isAlmost || isNone){
           guessed.set(character, match);
         }
       }

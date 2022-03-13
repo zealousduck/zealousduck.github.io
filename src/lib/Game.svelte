@@ -216,10 +216,11 @@
 
 <style>
   .wdl-game {
-    @apply flex flex-col justify-start rounded bg-stone-100;
+    @apply flex flex-col justify-between rounded bg-stone-100;
     padding-bottom: 0.15em;
     margin-bottom: 0.1em;
     height: fit-content;
+    flex: 1;
   }
 
   h2 {

@@ -9,12 +9,7 @@
     font-size: 140%;
   }
 
-  /* @media (max-height: 900px) {
-    :root {
-      font-size: 140%;
-    }
-  } */
-  @media (max-width: 410px) {
+  @media (max-width: 500px) {
     :root {
       font-size: 120%;
     }
@@ -22,10 +17,13 @@
 
   html {
     @apply bg-stone-200;
+    height: 100%;
+    width: 100%;
   }
 
   body {
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     padding: 0;
     margin: 0;
     /* prevent scrolling */
