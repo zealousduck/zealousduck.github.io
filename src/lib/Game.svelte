@@ -168,7 +168,7 @@
         class="help"
         on:click={() => store.set({ ...$store, keyboardAssist: true })}
       >
-        Turn on keyboard assist? 🧠
+        Turn on keyboard assist?  🧠
         <!-- heroicon ban -->
         <svg
           xmlns="http://www.w3.org/2000/svg"
