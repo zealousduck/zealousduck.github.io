@@ -26,7 +26,7 @@ export function getYesterdaysWord(): TodaysWord {
   const dict = JSON.parse(atob(dictionary));
   const result = {
     word: dict[index % dictionary.length],
-    date: today
+    date: today,
   };
   return result;
 }
@@ -45,10 +45,16 @@ export function getTodaysWord(): TodaysWord {
 
 export function exportGame(
   todaysWord: TodaysWord,
-  guesses: GuessResult[]
+  guesses: GuessResult[],
+  keyboardAssist: boolean
 ): string {
-  // TODO include number of attempts!
-  let builder = `wdl: ${todaysWord.date.toJSDate().toLocaleDateString()}\r\n`;
+  let builder = `wdl | ${todaysWord.date.toJSDate().toLocaleDateString()} | ${
+    guesses.length
+  }/${todaysWord.word.length}`;
+  if (!keyboardAssist) {
+    builder += " | 🧠";
+  }
+  builder += "\r\n";
   for (const guess of guesses) {
     for (const { match } of guess.characters) {
       if (match === "EXACT") {

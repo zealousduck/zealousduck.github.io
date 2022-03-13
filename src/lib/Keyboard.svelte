@@ -1,26 +1,53 @@
 <script lang="ts">
+  import type { WdlStore } from "./store";
+
+  import type { GuessCharacter } from "./wdlgame";
+
   export let onSubmit: () => void;
   export let onBackspace: () => void;
   export let onInput: (character: string) => void;
+  export let store: SvelteStore<WdlStore>;
 
   const characters: string[][] = [
     ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
     ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
     ["z", "x", "c", "v", "b", "n", "m"],
   ];
+
+  let guessed = new Map<string, GuessCharacter["match"]>();
+  $: {
+    if ($store.keyboardAssist) {
+      guessed = new Map<string, GuessCharacter["match"]>();
+      for (const { character, match } of $store.guesses
+        .map((_) => _.characters)
+        .flat()) {
+        if (match === "EXACT") {
+          guessed.set(character, match);
+        } else if (guessed.get(character) !== "EXACT") {
+          guessed.set(character, match);
+        }
+      }
+    }
+  }
 </script>
 
 <div class="keyboard">
   <div class="row one">
     {#each characters[0] as character}
-      <div class="character" on:click={() => onInput(character)}>
+      <div
+        class={`character ${guessed.get(character) || ""}`}
+        on:click={() => onInput(character)}
+      >
         <span>{character}</span>
       </div>
     {/each}
   </div>
   <div class="row two">
     {#each characters[1] as character}
-      <div class="character" on:click={() => onInput(character)}>
+      <div
+        class={`character ${guessed.get(character) || ""}`}
+        on:click={() => onInput(character)}
+      >
         <span>{character}</span>
       </div>
     {/each}
@@ -44,7 +71,10 @@
       </svg>
     </div>
     {#each characters[2] as character}
-      <div class="character" on:click={() => onInput(character)}>
+      <div
+        class={`character ${guessed.get(character) || ""}`}
+        on:click={() => onInput(character)}
+      >
         <span>{character}</span>
       </div>
     {/each}
@@ -100,6 +130,31 @@
     cursor: pointer;
     position: relative;
     box-shadow: 1px 1px 2px grey;
+  }
+
+  .character.NONE {
+    @apply text-white;
+    background-color: grey;
+  }
+  .character.NONE:hover {
+    background-color: grey;
+  }
+
+  .character.EXACT {
+    @apply text-white;
+    background-color: darkgreen;
+  }
+  .character.EXACT:hover {
+    background-color: rgb(0, 73, 0);
+  }
+
+  .character.ALMOST {
+    @apply text-white;
+    background-color: chocolate;
+  }
+  .character.ALMOST:hover {
+    @apply text-white;
+    background-color: rgb(161, 83, 27);
   }
 
   .character:hover {

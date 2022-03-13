@@ -74,6 +74,7 @@
     store.set({
       date,
       guesses: [...$store.guesses, result],
+      keyboardAssist: $store.keyboardAssist,
     });
     emptyGuesses = emptyGuesses.slice(1);
     resetGuess();
@@ -86,7 +87,7 @@
   let gameOver = false;
   $: {
     if ($store.date && $store.date.toISODate() !== date.toISODate()) {
-      store.set({ date, guesses: [] });
+      store.set({ date, guesses: [], keyboardAssist: false });
     }
     if ($store.guesses.length) {
       // wow this sure is unreadable, huh?
@@ -106,7 +107,10 @@
       emptyGuesses.push(emptyGuess);
     }
 
-    const tentative = characters.map(_ => _.character).filter(_ => _ !== EMPTY_CHARACTER).join("");
+    const tentative = characters
+      .map((_) => _.character)
+      .filter((_) => _ !== EMPTY_CHARACTER)
+      .join("");
     badWord = tentative.length === word.length && !validWords.has(tentative);
   }
 </script>
@@ -120,68 +124,94 @@
       <Guess {guess} />
     {/each}
     {#if !gameOver}
-      <Guess guess={{ characters }} focus={position} classes={badWord ? "invalid": ""}/>
+      <Guess
+        guess={{ characters }}
+        focus={position}
+        classes={badWord ? "invalid" : ""}
+      />
     {/if}
     {#each emptyGuesses as guess}
       <Guess {guess} />
     {/each}
   </div>
-    {#if gameOver}
-      <div class="actions">
-        <button
+  {#if gameOver}
+    <div class="actions">
+      <button
         class={gameCopiedToClipboard ? "done" : "ready"}
-          on:click={() => {
-            navigator.clipboard.writeText(
-              exportGame(todaysWord, $store.guesses)
-            );
-            gameCopiedToClipboard = true;
-            // scoreCopiedToClipboard = false;
-          }}
+        on:click={() => {
+          navigator.clipboard.writeText(exportGame(todaysWord, $store.guesses, $store.keyboardAssist));
+          gameCopiedToClipboard = true;
+          // scoreCopiedToClipboard = false;
+        }}
+      >
+        <span>{gameCopiedToClipboard ? "Copied" : "Share"}</span>
+        <!-- heroicons copy-to-clipboard -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="share"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="1"
         >
-          <span>{gameCopiedToClipboard ? "Copied" : "Share"}</span>
-          <!-- heroicons copy-to-clipboard -->
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="share"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="1"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-            />
-          </svg>
-        </button>
-      </div>
-      {:else}
-  <Keyboard
-    onInput={(character) => {
-      if (position < word.length) {
-        characters[position] = { character, match: "" };
-        position += 1;
-      }
-    }}
-    onBackspace={() => {
-      if (position > 0) {
-        position -= 1;
-        characters[position] = { character: EMPTY_CHARACTER, match: "" };
-      }
-    }}
-    onSubmit={() => {
-      const guess = characters.map((_) => _.character).join("");
-      const isValid = validWords.has(guess);
-      if (isValid) {
-        doGuess(guess);
-      } else {
-        alert("Please use a real word.");
-        resetGuess();
-      }
-    }}
-  />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+          />
+        </svg>
+      </button>
+    </div>
+  {:else}
+    {#if !$store.keyboardAssist}
+      <button
+        class="help"
+        on:click={() => store.set({ ...$store, keyboardAssist: true })}
+      >
+        Turn on keyboard assist? 🧠
+        <!-- heroicon ban -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="1"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+          />
+        </svg>
+      </button>
     {/if}
+    <Keyboard
+      {store}
+      onInput={(character) => {
+        if (position < word.length) {
+          characters[position] = { character, match: "" };
+          position += 1;
+        }
+      }}
+      onBackspace={() => {
+        if (position > 0) {
+          position -= 1;
+          characters[position] = { character: EMPTY_CHARACTER, match: "" };
+        }
+      }}
+      onSubmit={() => {
+        const guess = characters.map((_) => _.character).join("");
+        const isValid = validWords.has(guess);
+        if (isValid) {
+          doGuess(guess);
+        } else {
+          alert("Please use a real word.");
+          resetGuess();
+        }
+      }}
+    />
+  {/if}
 </div>
 
 <style>
@@ -199,6 +229,28 @@
 
   .rows {
     padding-bottom: 1em;
+  }
+
+  .help {
+    @apply text-white;
+    background-color: brown;
+    border-radius: 999em;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1em;
+    padding: 0.25em 1em;
+    position: relative;
+  }
+
+  .help svg {
+    color: white;
+    display: inline;
+    height: 1.9em;
+    width: 1.9em;
+    position: absolute;
+    top: 0.1em;
+    right: 0.75em;
   }
 
   .actions {

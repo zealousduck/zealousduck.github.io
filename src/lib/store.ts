@@ -5,6 +5,7 @@ import type { GuessResult, TodaysWord } from "./wdlgame";
 export interface WdlStore {
   date: DateTime;
   guesses: GuessResult[];
+  keyboardAssist: boolean;
 }
 
 const wdlKey = "local_storage_wdl";
@@ -21,6 +22,7 @@ try {
   parsed = {
     date: DateTime.now(),
     guesses: [],
+    keyboardAssist: false
   };
 }
 
