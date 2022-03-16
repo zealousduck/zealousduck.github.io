@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { isFresh, WdlStore } from "./store";
 import valid_words from "./words_pruned.json";
 
 export const validWords = new Set<string>(valid_words);
@@ -44,17 +45,43 @@ export function getTodaysWord(): TodaysWord {
 }
 
 export function exportGame(
-  todaysWord: TodaysWord,
-  guesses: GuessResult[],
-  keyboardAssist: boolean
+  word: string,
+  game: WdlStore,
+  previous: WdlStore[]
 ): string {
-  let builder = `wdl | ${todaysWord.date.toJSDate().toLocaleDateString()} | ${
+  const { date, guesses, keyboardAssist } = game;
+  let builder = `wdl | ${date.toJSDate().toLocaleDateString()} | ${
     guesses.length
-  }/${todaysWord.word.length}`;
-  if (!keyboardAssist) {
-    builder += " | 🧠";
-  }
+  }/${word.length}`;
   builder += "\r\n";
+
+  if (game.success) {
+
+  const badges: string[] = [];
+  if (!keyboardAssist) {
+    badges.push("🧠");
+  }
+  if (isFresh(game, previous)) {
+    badges.push("✨");
+  }
+  if (game.success) {
+    // +1 to account for 0-indexing
+    const totalWins: number = previous.filter((_) => _.success).length;
+    const consecutiveWins: number =
+      totalWins === previous.length
+        ? totalWins
+        : previous.reverse().findIndex((_) => !_.success) + 1;
+    if (consecutiveWins > 1) {
+      // +1 to account for today's win
+      badges.push(`🔥x${consecutiveWins + 1}`);
+    }
+  }
+  if (badges.length > 0) {
+    builder += badges.join(" | ");
+    builder += "\r\n";
+  }
+  }
+
   for (const guess of guesses) {
     for (const { match } of guess.characters) {
       if (match === "EXACT") {

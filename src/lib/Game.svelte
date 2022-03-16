@@ -3,7 +3,7 @@
 
   import Guess from "./Guess.svelte";
   import Keyboard from "./Keyboard.svelte";
-  import { store } from "./store";
+  import { getPreviousGames, saveGame, store } from "./store";
   import {
     emptyGuess,
     EMPTY_CHARACTER,
@@ -15,7 +15,7 @@
   } from "./wdlgame";
 
   const todaysWord = getTodaysWord();
-  // const { word, date } = { word: "waffle", date: DateTime.fromObject({ year : 2020 })}
+  // const { word, date } = { word: "result", date: DateTime.now().plus({ day: 14}) };
   const { word, date } = todaysWord;
 
   let emptyGuesses: GuessResult[];
@@ -75,6 +75,7 @@
       date,
       guesses: [...$store.guesses, result],
       keyboardAssist: $store.keyboardAssist,
+      success,
     });
     emptyGuesses = emptyGuesses.slice(1);
     resetGuess();
@@ -124,8 +125,9 @@
   let gameOver = false;
   $: {
     if ($store.date && $store.date.toISODate() !== date.toISODate()) {
-      store.set({ date, guesses: [], keyboardAssist: false });
+      store.set({ date, guesses: [], keyboardAssist: false, success: false });
     }
+
     if ($store.guesses.length) {
       // wow this sure is unreadable, huh?
       success =
@@ -153,6 +155,7 @@
 
     if (gameOver) {
       document.removeEventListener("keydown", onKeyDown);
+      saveGame($store);
     }
   }
 </script>
@@ -182,7 +185,7 @@
         class={gameCopiedToClipboard ? "done" : "ready"}
         on:click={() => {
           navigator.clipboard.writeText(
-            exportGame(todaysWord, $store.guesses, $store.keyboardAssist)
+            exportGame(word, $store, getPreviousGames())
           );
           gameCopiedToClipboard = true;
           // scoreCopiedToClipboard = false;
