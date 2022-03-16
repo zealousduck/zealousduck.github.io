@@ -81,6 +81,43 @@
     return result;
   }
 
+  function onInput(character) {
+    if (position < word.length) {
+      characters[position] = { character, match: "" };
+      position += 1;
+    }
+  }
+
+  function onBackspace() {
+    if (position > 0) {
+      position -= 1;
+      characters[position] = { character: EMPTY_CHARACTER, match: "" };
+    }
+  }
+
+  function onSubmit() {
+    const guess = characters.map((_) => _.character).join("");
+    const isValid = validWords.has(guess);
+    if (isValid) {
+      doGuess(guess);
+    } else {
+      alert("Please use a real word.");
+      resetGuess();
+    }
+  }
+
+  function onKeyDown(e: KeyboardEvent) {
+    const key = e.key.toLowerCase();
+    if (key === "backspace") {
+      onBackspace();
+    } else if (key === "enter" && position >= word.length) {
+      onSubmit();
+    } else if (key.length === 1 && key >= "a" && key <= "z") {
+      onInput(key);
+    }
+  }
+  document.addEventListener("keydown", onKeyDown);
+
   let gameCopiedToClipboard = false;
   let badWord = false;
   let success = false;
@@ -101,7 +138,6 @@
     const emptyLength = Math.max(word.length - $store.guesses.length - 1, 0);
     emptyGuesses = new Array(emptyLength).fill(emptyGuess, 0, emptyLength);
 
-    gameOver = success || $store.guesses.length >= word.length;
     if (success && $store.guesses.length < word.length) {
       // push an empty guess to hide the missing input row
       emptyGuesses.push(emptyGuess);
@@ -112,6 +148,12 @@
       .filter((_) => _ !== EMPTY_CHARACTER)
       .join("");
     badWord = tentative.length === word.length && !validWords.has(tentative);
+
+    gameOver = success || $store.guesses.length >= word.length;
+
+    if (gameOver) {
+      document.removeEventListener("keydown", onKeyDown);
+    }
   }
 </script>
 
@@ -139,7 +181,9 @@
       <button
         class={gameCopiedToClipboard ? "done" : "ready"}
         on:click={() => {
-          navigator.clipboard.writeText(exportGame(todaysWord, $store.guesses, $store.keyboardAssist));
+          navigator.clipboard.writeText(
+            exportGame(todaysWord, $store.guesses, $store.keyboardAssist)
+          );
           gameCopiedToClipboard = true;
           // scoreCopiedToClipboard = false;
         }}
@@ -168,7 +212,7 @@
         class="help"
         on:click={() => store.set({ ...$store, keyboardAssist: true })}
       >
-        Turn on keyboard assist?  🧠
+        Turn on keyboard assist? 🧠
         <!-- heroicon ban -->
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -186,31 +230,7 @@
         </svg>
       </button>
     {/if}
-    <Keyboard
-      {store}
-      onInput={(character) => {
-        if (position < word.length) {
-          characters[position] = { character, match: "" };
-          position += 1;
-        }
-      }}
-      onBackspace={() => {
-        if (position > 0) {
-          position -= 1;
-          characters[position] = { character: EMPTY_CHARACTER, match: "" };
-        }
-      }}
-      onSubmit={() => {
-        const guess = characters.map((_) => _.character).join("");
-        const isValid = validWords.has(guess);
-        if (isValid) {
-          doGuess(guess);
-        } else {
-          alert("Please use a real word.");
-          resetGuess();
-        }
-      }}
-    />
+    <Keyboard {store} {onInput} {onBackspace} {onSubmit} />
   {/if}
 </div>
 
