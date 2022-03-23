@@ -1,5 +1,6 @@
 <script lang="ts">
   import TailwindCss from "./TailwindCSS.svelte";
+  import Menu from "./lib/Menu.svelte";
   import Logo from "./lib/Logo.svelte";
   import Game from "./lib/Game.svelte";
 </script>
@@ -8,6 +9,7 @@
 
 <main class="flex centered">
   <div class="wrapper justify-center">
+    <Menu />
     <Logo />
     <Game />
   </div>

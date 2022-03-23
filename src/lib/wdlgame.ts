@@ -1,3 +1,4 @@
+import { cloneDeep } from "lodash";
 import { DateTime } from "luxon";
 import { isFresh, WdlStore } from "./store";
 import valid_words from "./words_pruned.json";
@@ -44,11 +45,22 @@ export function getTodaysWord(): TodaysWord {
   return result;
 }
 
+export function exportOneLiner(game: WdlStore): string {
+  let builder = "";
+  if (game.success) {
+    builder += `${game.guesses.length}/6`;
+  } else {
+    builder += `X/6`;
+  }
+  return builder;
+}
+
 export function exportGame(
   word: string,
   game: WdlStore,
-  previous: WdlStore[]
+  previousIn: WdlStore[]
 ): string {
+  const previous = cloneDeep(previousIn);
   const { date, guesses, keyboardAssist } = game;
   let builder = `wdl | ${date.toJSDate().toLocaleDateString()} | ${
     guesses.length
@@ -56,15 +68,16 @@ export function exportGame(
   builder += "\r\n";
 
   if (game.success) {
-
-  const badges: string[] = [];
-  if (!keyboardAssist) {
-    badges.push("🧠");
-  }
-  if (isFresh(game, previous)) {
-    badges.push("✨");
-  }
-  if (game.success) {
+    const badges: string[] = [];
+    if (!keyboardAssist) {
+      badges.push("🧠");
+    }
+    if (isFresh(game, previous)) {
+      badges.push("✨");
+    }
+    if (isOrangeBadge(game)) {
+      badges.push("🍊");
+    }
     // +1 to account for 0-indexing
     const totalWins: number = previous.filter((_) => _.success).length;
     const consecutiveWins: number =
@@ -75,11 +88,10 @@ export function exportGame(
       // +1 to account for today's win
       badges.push(`🔥x${consecutiveWins + 1}`);
     }
-  }
-  if (badges.length > 0) {
-    builder += badges.join(" | ");
-    builder += "\r\n";
-  }
+    if (badges.length > 0) {
+      builder += badges.join(" | ");
+      builder += "\r\n";
+    }
   }
 
   for (const guess of guesses) {
@@ -95,6 +107,18 @@ export function exportGame(
     builder += "\r\n";
   }
   return builder;
+}
+
+function isOrangeBadge(game: WdlStore): boolean {
+  for (const match of game.guesses
+    .map((_) => _.characters)
+    .flat()
+    .map((_) => _.match)) {
+    if (match === "ALMOST") {
+      return false;
+    }
+  }
+  return true;
 }
 
 export const emptyGuess: GuessResult = {

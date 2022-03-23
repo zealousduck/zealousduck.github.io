@@ -1,6 +1,5 @@
 <script lang="ts">
   import { DateTime } from "luxon";
-
   import Guess from "./Guess.svelte";
   import Keyboard from "./Keyboard.svelte";
   import { getPreviousGames, saveGame, store } from "./store";
@@ -96,8 +95,14 @@
     }
   }
 
+  let debug = false;
   function onSubmit() {
     const guess = characters.map((_) => _.character).join("");
+    if (guess === `debug${EMPTY_CHARACTER}`) {
+      debug = true;
+      resetGuess();
+      return;
+    }
     const isValid = validWords.has(guess);
     if (isValid) {
       doGuess(guess);
@@ -165,6 +170,11 @@
     <div>
       <h2>{todaysWord.date.toLocaleString()}</h2>
     </div>
+    <dialog class="debug" open={debug}>
+      <pre>{JSON.stringify(getPreviousGames(), undefined, 2)}</pre>
+      <button on:click={() => navigator.clipboard.writeText(JSON.stringify(getPreviousGames(), undefined, 2))}>Copy</button>
+      <button on:click={() => (debug = false)}>Close</button>
+    </dialog>
     {#each $store.guesses as guess}
       <Guess {guess} />
     {/each}
@@ -310,5 +320,16 @@
     position: relative;
     top: -1px;
     left: 1px;
+  }
+
+  dialog.debug {
+    z-index: 999;
+  }
+
+  dialog.debug pre {
+    text-align: start;
+    max-height: 30em;
+    font-size: 69%;
+    overflow: scroll;
   }
 </style>
