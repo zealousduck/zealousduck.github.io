@@ -78,6 +78,9 @@ export function exportGame(
     if (isOrangeBadge(game)) {
       badges.push("🍊");
     }
+    if (isComebackBadge(game)) {
+      badges.push("🪃");
+    }
     // +1 to account for 0-indexing
     const totalWins: number = previous.filter((_) => _.success).length;
     const consecutiveWins: number =
@@ -115,6 +118,15 @@ function isOrangeBadge(game: WdlStore): boolean {
     .flat()
     .map((_) => _.match)) {
     if (match === "ALMOST") {
+      return false;
+    }
+  }
+  return true;
+}
+
+function isComebackBadge(game: WdlStore): boolean {
+  for (const match of game.guesses[0].characters.map(_ => _.match)) {
+    if (match !== "NONE") {
       return false;
     }
   }
