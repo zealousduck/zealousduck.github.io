@@ -70,7 +70,7 @@ import { exportGame, exportOneLiner } from "./wdlgame";
     top: 0;
     left: 0;
     position: absolute;
-    background-color: rgba(10, 10, 10, 0.3);
+    background-color: rgba(10, 10, 10, 0.4);
     width: 100%;
     height: 100%;
     z-index: 10;
@@ -84,7 +84,7 @@ import { exportGame, exportOneLiner } from "./wdlgame";
 
   .menu {
     @apply bg-stone-100;
-    height: 100vh;
+    height: 100%;
     width: 80%;
     max-width: 25em;
     overflow-x: hidden;
