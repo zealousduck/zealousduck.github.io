@@ -2,6 +2,7 @@
   import { DateTime } from "luxon";
   import Guess from "./Guess.svelte";
   import Keyboard from "./Keyboard.svelte";
+  import { darkMode } from "./dark-mode";
   import { getPreviousGames, saveGame, store } from "./store";
   import {
     emptyGuess,
@@ -98,7 +99,9 @@
   function onSubmit() {
     const guess = characters.map((_) => _.character).join("");
     if (guess === `debug${EMPTY_CHARACTER}`) {
-      navigator.clipboard.writeText(JSON.stringify(getPreviousGames(), undefined, 2))
+      navigator.clipboard.writeText(
+        JSON.stringify(getPreviousGames(), undefined, 2)
+      );
       return;
     }
     const isValid = validWords.has(guess);
@@ -161,12 +164,17 @@
       saveGame($store);
     }
   }
+
+  let darkModeClass = $darkMode ? "dark-mode" : "";
+  $: {
+    darkModeClass = $darkMode ? "dark-mode" : "";
+  }
 </script>
 
-<div name="wdl" class="wdl-game">
+<div name="wdl" class={`wdl-game ${darkModeClass}`}>
   <div class="rows">
     <div>
-      <h2>{todaysWord.date.toLocaleString()}</h2>
+      <h2 class={darkModeClass}>{todaysWord.date.toLocaleString()}</h2>
     </div>
     {#each $store.guesses as guess}
       <Guess {guess} />
@@ -215,7 +223,7 @@
   {:else}
     {#if !$store.keyboardAssist}
       <button
-        class="help"
+        class={`help ${darkModeClass}`}
         on:click={() => store.set({ ...$store, keyboardAssist: true })}
       >
         Turn on keyboard assist? 🧠
@@ -249,9 +257,18 @@
     flex: 1;
   }
 
+  .dark-mode.wdl-game {
+    @apply bg-neutral-600;
+  }
+
   h2 {
     font-weight: lighter;
+    padding-top: 0.2em;
     padding-bottom: 0.2em;
+  }
+
+  h2.dark-mode {
+    @apply text-white;
   }
 
   .rows {
@@ -268,6 +285,10 @@
     margin-bottom: 1em;
     padding: 0.25em 1em;
     position: relative;
+  }
+
+  .help.dark-mode {
+    background-color: rgb(121, 52, 52);
   }
 
   .help svg {

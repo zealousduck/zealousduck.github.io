@@ -1,7 +1,8 @@
 <script lang="ts">
-  import {cloneDeep} from "lodash";
+  import { cloneDeep } from "lodash";
+  import { darkMode } from "./dark-mode";
   import { getPreviousGames, WdlStore } from "./store";
-import { exportGame, exportOneLiner } from "./wdlgame";
+  import { exportOneLiner } from "./wdlgame";
 
   let menuOpen = false;
 
@@ -10,9 +11,18 @@ import { exportGame, exportOneLiner } from "./wdlgame";
   }
 
   const previousGames = cloneDeep(getPreviousGames()).reverse();
+
+  let darkModeClass = $darkMode ? "dark-mode" : "";
+  $: {
+    darkModeClass = $darkMode ? "dark-mode" : "";
+  }
 </script>
 
-<button class="menu-button" id="open-menu" on:click={() => (menuOpen = true)}>
+<button
+  class={`menu-button ${darkModeClass}`}
+  id="open-menu"
+  on:click={() => (menuOpen = true)}
+>
   <!-- heroicon menu -->
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -34,23 +44,43 @@ import { exportGame, exportOneLiner } from "./wdlgame";
     class={`backdrop ${menuOpen ? "" : "hidden"}`}
     on:click={() => (menuOpen = false)}
   />
-  <div class={`menu ${menuOpen ? "" : "hidden"}`}>
+  <div class={`menu ${darkModeClass} ${menuOpen ? `` : "hidden"}`}>
     <div class="previous-days">
       <div class="day">Previous Games</div>
-      {#each previousGames as game,i}
+      {#each previousGames as game, i}
         <div class="day">
           <div class="line">
-          <span class="inline-block">{game.date.toLocaleString()}</span>
-          <span class="inline-block">{exportOneLiner(game)}</span>
+            <span class="inline-block">{game.date.toLocaleString()}</span>
+            <span class="inline-block">{exportOneLiner(game)}</span>
           </div>
           <div class="line">
-          <span class="inline-block">Starter word: {getFirstWord(game)}</span>
+            <span class="inline-block">Starter word: {getFirstWord(game)}</span>
           </div>
         </div>
       {/each}
     </div>
   </div>
 </div>
+<button
+  class={`dark-mode-button ${darkModeClass}`}
+  on:click={() => (darkMode.set(!$darkMode))}
+>
+  <!-- heroicon moon -->
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    class="h-6 w-6"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    stroke-width="1"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+    />
+  </svg>
+</button>
 
 <style>
   .menu-button {
@@ -59,6 +89,22 @@ import { exportGame, exportOneLiner } from "./wdlgame";
     left: 0.75em;
     width: 1.5em;
     height: 1.5em;
+  }
+
+  .menu-button.dark-mode {
+    @apply text-white;
+  }
+
+  .dark-mode-button {
+    position: absolute;
+    top: 0.75em;
+    right: 0.75em;
+    width: 1.5em;
+    height: 1.5em;
+  }
+
+  .dark-mode-button.dark-mode {
+      @apply text-white;
   }
 
   .menu-wrapper.hidden {
@@ -103,6 +149,14 @@ import { exportGame, exportOneLiner } from "./wdlgame";
   .menu.hidden {
     transition: left 0.5s;
     left: -80%;
+  }
+
+  .menu.dark-mode {
+    @apply bg-neutral-600 text-white;
+  }
+
+  .menu.hidden.dark-mode {
+    @apply bg-neutral-600;
   }
 
   .previous-days {

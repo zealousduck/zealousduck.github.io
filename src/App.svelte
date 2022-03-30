@@ -3,6 +3,12 @@
   import Menu from "./lib/Menu.svelte";
   import Logo from "./lib/Logo.svelte";
   import Game from "./lib/Game.svelte";
+  import { darkMode } from "./lib/dark-mode";
+
+  $: {
+    document.getElementById("app").parentElement.parentElement.className =
+      $darkMode ? "dark-mode" : "";
+  }
 </script>
 
 <TailwindCss />

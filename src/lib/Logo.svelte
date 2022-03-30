@@ -1,5 +1,6 @@
 <script lang="ts">
   import Character from "./Character.svelte";
+  import { darkMode } from "./dark-mode";
   import { EMPTY_CHARACTER, getYesterdaysWord, GuessResult } from "./wdlgame";
 
   const today = new Date().toLocaleDateString();
@@ -34,13 +35,18 @@
   };
 
   const yesterdaysWord = getYesterdaysWord();
+
+  let darkModeClass = $darkMode ? "dark-mode" : "";
+  $: {
+    darkModeClass = $darkMode ? "dark-mode" : "";
+  }
 </script>
 
 <div class="logo">
   {#each logo.characters as character}
     <Character {...character} />
   {/each}
-  <h2>{`Yesterday's answer: ${yesterdaysWord.word}`}</h2>
+  <h2 class={darkModeClass}>{`Yesterday's answer: ${yesterdaysWord.word}`}</h2>
 </div>
 
 <style>
@@ -50,5 +56,9 @@
 
   h2 {
     font-weight: lighter;
+  }
+
+  h2.dark-mode {
+    @apply text-white;
   }
 </style>

@@ -21,6 +21,10 @@
     width: 100%;
   }
 
+  html.dark-mode {
+    @apply bg-neutral-700;
+  }
+
   body {
     height: 100%;
     width: 100%;

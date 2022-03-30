@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { darkMode } from "./dark-mode";
   import type { WdlStore } from "./store";
-
   import type { GuessCharacter } from "./wdlgame";
 
   export let onSubmit: () => void;
@@ -32,13 +32,18 @@
       }
     }
   }
+
+  let darkModeClass = $darkMode ? "dark-mode" : "";
+  $: {
+    darkModeClass = $darkMode ? "dark-mode" : "";
+  }
 </script>
 
 <div class="keyboard">
   <div class="row one">
     {#each characters[0] as character}
       <div
-        class={`character ${guessed.get(character) || ""}`}
+        class={`character ${darkModeClass} ${guessed.get(character) || ""}`}
         on:click={() => onInput(character)}
       >
         <span>{character}</span>
@@ -48,7 +53,7 @@
   <div class="row two">
     {#each characters[1] as character}
       <div
-        class={`character ${guessed.get(character) || ""}`}
+        class={`character ${darkModeClass} ${guessed.get(character) || ""}`}
         on:click={() => onInput(character)}
       >
         <span>{character}</span>
@@ -56,7 +61,7 @@
     {/each}
   </div>
   <div class="row three">
-    <div class="character" on:click={() => onSubmit()}>
+    <div class={`character ${darkModeClass}`} on:click={() => onSubmit()}>
       <!-- heroicons.com check -->
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -75,13 +80,13 @@
     </div>
     {#each characters[2] as character}
       <div
-        class={`character ${guessed.get(character) || ""}`}
+        class={`character ${darkModeClass} ${guessed.get(character) || ""}`}
         on:click={() => onInput(character)}
       >
         <span>{character}</span>
       </div>
     {/each}
-    <div class="character" on:click={() => onBackspace()}>
+    <div class={`character ${darkModeClass}`} on:click={() => onBackspace()}>
       <!-- heroicons.com backspace -->
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -135,6 +140,13 @@
     box-shadow: 1px 1px 2px grey;
   }
 
+  .character.dark-mode {
+    @apply text-white bg-neutral-600;
+  }
+  .character.dark-mode:hover {
+    @apply text-white bg-neutral-700;
+  }
+
   .character.NONE {
     @apply text-white;
     background-color: grey;
@@ -177,4 +189,5 @@
     width: 2em;
     height: 2.5em;
   }
+
 </style>

@@ -1,12 +1,18 @@
 <script lang="ts">
+  import { darkMode } from "./dark-mode";
   export let character;
   export let match: "" | "NONE" | "ALMOST" | "EXACT";
   export let isFocused: boolean = false;
   export let classes = "";
   let style = match.toLowerCase();
+
+  let darkModeClass = $darkMode ? "dark-mode" : "";
+  $: {
+    darkModeClass = $darkMode ? "dark-mode" : "";
+  }
 </script>
 
-<span class={`character ${isFocused ? "focused" : ""} ${style} ${classes}`}>
+<span class={`character ${darkModeClass} ${isFocused ? "focused" : ""} ${style} ${classes}`}>
   {character}
 </span>
 
@@ -22,9 +28,16 @@
     padding-top: 0.1em;
     margin: 0 0.2em;
   }
+  .character.dark-mode {
+    @apply text-white;
+  }
 
   .character.focused {
     @apply bg-blue-100;
+  }
+
+  .character.focused.dark-mode {
+    background-color: rgb(47, 95, 95);
   }
 
   .none {
