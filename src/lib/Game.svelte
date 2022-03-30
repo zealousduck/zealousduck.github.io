@@ -258,7 +258,7 @@
   }
 
   .dark-mode.wdl-game {
-    @apply bg-neutral-600;
+    @apply bg-neutral-700;
   }
 
   h2 {

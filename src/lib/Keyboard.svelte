@@ -141,10 +141,10 @@
   }
 
   .character.dark-mode {
-    @apply text-white bg-neutral-600;
+    @apply text-white bg-neutral-700;
   }
   .character.dark-mode:hover {
-    @apply text-white bg-neutral-700;
+    @apply text-white bg-neutral-800;
   }
 
   .character.NONE {

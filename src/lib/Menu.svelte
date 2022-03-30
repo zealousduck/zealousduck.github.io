@@ -152,11 +152,11 @@
   }
 
   .menu.dark-mode {
-    @apply bg-neutral-600 text-white;
+    @apply bg-neutral-700 text-white;
   }
 
   .menu.hidden.dark-mode {
-    @apply bg-neutral-600;
+    @apply bg-neutral-700;
   }
 
   .previous-days {

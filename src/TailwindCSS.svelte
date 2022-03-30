@@ -22,7 +22,7 @@
   }
 
   html.dark-mode {
-    @apply bg-neutral-700;
+    @apply bg-neutral-600;
   }
 
   body {
