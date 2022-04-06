@@ -4,11 +4,12 @@
   export let guess: GuessResult;
   export let focus: number | undefined = undefined;
   export let classes = "";
+  export let setPosition: undefined | ((i: number) => void) = undefined;
 </script>
 
 <div class="guess-line">
   {#each guess.characters as character, i}
-    <Character {...character} isFocused={focus === i} {classes} />
+    <Character {...character} isFocused={focus === i} {classes} setPosition={setPosition ? () => setPosition(i) : undefined} />
   {/each}
 </div>
 

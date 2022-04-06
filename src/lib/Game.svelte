@@ -25,6 +25,14 @@
     match: "",
   });
 
+  function getTentative(): string {
+    const tentative = characters
+      .map((_) => _.character)
+      .filter((_) => _ !== EMPTY_CHARACTER)
+      .join("");
+    return tentative;
+  }
+
   function resetGuess(): void {
     characters = new Array(word.length).fill({
       character: EMPTY_CHARACTER,
@@ -83,9 +91,16 @@
   }
 
   function onInput(character) {
+    // only set character if there's a slot for it
     if (position < word.length) {
       characters[position] = { character, match: "" };
-      position += 1;
+    }
+
+    // only move the cursor to start if player has slots left
+    if (getTentative().length === word.length) {
+      position = 6;
+    } else {
+      position = (position + 1) % word.length;
     }
   }
 
@@ -93,6 +108,8 @@
     if (position > 0) {
       position -= 1;
       characters[position] = { character: EMPTY_CHARACTER, match: "" };
+    } else {
+      resetGuess();
     }
   }
 
@@ -151,10 +168,7 @@
       emptyGuesses.push(emptyGuess);
     }
 
-    const tentative = characters
-      .map((_) => _.character)
-      .filter((_) => _ !== EMPTY_CHARACTER)
-      .join("");
+    const tentative = getTentative();
     badWord = tentative.length === word.length && !validWords.has(tentative);
 
     gameOver = success || $store.guesses.length >= word.length;
@@ -184,6 +198,10 @@
         guess={{ characters }}
         focus={position}
         classes={badWord ? "invalid" : ""}
+        setPosition={(i) => {
+          position = i + 1;
+          onBackspace();
+        }}
       />
     {/if}
     {#each emptyGuesses as guess}

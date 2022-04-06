@@ -4,6 +4,7 @@
   export let match: "" | "NONE" | "ALMOST" | "EXACT";
   export let isFocused: boolean = false;
   export let classes = "";
+  export let setPosition: undefined | (() => void) = undefined;
   let style = match.toLowerCase();
 
   let darkModeClass = $darkMode ? "dark-mode" : "";
@@ -12,7 +13,12 @@
   }
 </script>
 
-<span class={`character ${darkModeClass} ${isFocused ? "focused" : ""} ${style} ${classes}`}>
+<span
+  class={`character ${darkModeClass} ${
+    isFocused ? "focused" : ""
+  } ${style} ${classes} ${setPosition ? "cursor-pointer" : ""}`}
+  on:click={() => setPosition && setPosition()}
+>
   {character}
 </span>
 
@@ -38,6 +44,10 @@
 
   .character.focused.dark-mode {
     background-color: rgb(47, 95, 95);
+  }
+
+  .character.cursor-pointer {
+    cursor: pointer;
   }
 
   .none {
