@@ -168,7 +168,11 @@
       emptyGuesses.push(emptyGuess);
     }
 
-    const tentative = getTentative();
+    // can't use `getTentative` because apparently svelte doesn't recognize the re-render?
+    const tentative = characters
+      .map((_) => _.character)
+      .filter((_) => _ !== EMPTY_CHARACTER)
+      .join("");
     badWord = tentative.length === word.length && !validWords.has(tentative);
 
     gameOver = success || $store.guesses.length >= word.length;
