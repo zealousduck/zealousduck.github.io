@@ -27,7 +27,7 @@ export function getYesterdaysWord(): TodaysWord {
   const index = -Math.floor(epoch.diff(today, "days").days) - 1;
   const dict = JSON.parse(atob(dictionary));
   const result = {
-    word: dict[index % dictionary.length],
+    word: dict[index % dict.length],
     date: today,
   };
   return result;
@@ -39,7 +39,7 @@ export function getTodaysWord(): TodaysWord {
   const index = -Math.floor(epoch.diff(today, "days").days);
   const dict = JSON.parse(atob(dictionary));
   const result = {
-    word: dict[index % dictionary.length],
+    word: dict[index % dict.length],
     date: today,
   };
   return result;
